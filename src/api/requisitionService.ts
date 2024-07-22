@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api"; // Replace with your backend URL
+const API_URL = "http://localhost:5000/api";
 
 class RequisitionService {
   createRequisition = async (data: any) => {
