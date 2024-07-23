@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserPlus, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import icon from "../assets/icon.png";
+import background from "../assets/image/herobackground1.jpg"; 
 
 const HeroSection = () => (
-  <section className="bg-white py-20">
-    <div className="container mx-auto flex flex-col items-center text-center px-4">
+  <section
+    className="bg-cover bg-center py-20"
+    style={{ backgroundImage: `url(${background})` }} 
+  >
+    <div className="bg-white bg-opacity-75 py-20 container mx-auto flex flex-col items-center text-center px-4 rounded-lg shadow-lg">
       <img
         src={icon}
         alt="CashFusion Hero Img"
@@ -20,14 +26,16 @@ const HeroSection = () => (
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-8">
         <Link
           to="/signup"
-          className="bg-orange-500 text-white py-3 px-6 rounded-full hover:bg-orange-700 transition-colors text-lg font-semibold"
+          className="bg-orange-500 text-white py-3 px-6 rounded-full hover:bg-orange-700 transition-colors text-lg font-semibold flex items-center"
         >
+          <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
           Get Started
         </Link>
         <Link
           to="/login"
-          className="bg-blue-900 text-white py-3 px-6 rounded-full hover:bg-blue-800 transition-colors text-lg font-semibold"
+          className="bg-blue-900 text-white py-3 px-6 rounded-full hover:bg-blue-800 transition-colors text-lg font-semibold flex items-center"
         >
+          <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
           Log In
         </Link>
       </div>

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import logo from "../assets/logo-no-background.png";
 
 const Header = () => (
-  <header className="bg-blue-100 p-4 text-blue-900">
+  <header className="bg-blue-100 p-4 text-blue-900 sticky top-0 z-50 shadow-md">
     <nav className="container mx-auto flex justify-between items-center">
       <div className="flex items-center">
         <img src={logo} alt="CashFusion Logo" className="h-10 mr-3" />
