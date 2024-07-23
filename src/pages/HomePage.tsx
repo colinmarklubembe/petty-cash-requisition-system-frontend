@@ -1,11 +1,21 @@
-import React from "react";
+import {
+  Header,
+  HeroSection,
+  FeaturesSection,
+  Testimonials,
+  CallToAction,
+  Footer,
+} from "../components";
 
-const HomePage: React.FC = () => {
-  return (
-    <div className="container mx-auto">
-      <h1 className="text-2xl font-bold">Home Page</h1>
-    </div>
-  );
-};
+const Home = () => (
+  <div>
+    <Header />
+    <HeroSection />
+    <FeaturesSection />
+    <Testimonials />
+    <CallToAction />
+    <Footer />
+  </div>
+);
 
-export default HomePage;
+export default Home;
