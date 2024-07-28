@@ -58,7 +58,7 @@ const CompaniesPage = () => {
     };
 
     fetchCompanies();
-  }, [navigate, companiesWithRoles]);
+  }, [navigate, companiesWithRoles, companies]);
 
   const handleCreateCompany = (newCompanyInput: CompanyFormInputs) => {
     const newCompany: Company = {
@@ -72,7 +72,7 @@ const CompaniesPage = () => {
       updatedAt: new Date().toISOString(),
     };
 
-    setCompanies([...companies, newCompany]);
+    setCompanies((prevCompanies) => [...prevCompanies, newCompany]);
     setShowCreateCompanyModal(false);
   };
 

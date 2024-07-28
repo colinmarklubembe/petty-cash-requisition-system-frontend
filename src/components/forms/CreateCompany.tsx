@@ -63,6 +63,8 @@ const CreateCompany: React.FC<CreateCompanyProps> = ({ onClose, onCreate }) => {
       const response = await companyApi.createCompany(data);
       setToastMessage(response.message);
       console.log("Company Created Successfully! ", response);
+      onCreate(data);
+      onClose();
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error ||
