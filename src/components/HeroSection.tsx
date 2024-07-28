@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserPlus, faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import icon from "../assets/icon.png";
-import background from "../assets/image/herobackground1.jpg"; 
+import background from "../assets/image/herobackground1.jpg";
 
 const HeroSection = () => (
   <section
     className="bg-cover bg-center py-20"
-    style={{ backgroundImage: `url(${background})` }} 
+    style={{ backgroundImage: `url(${background})` }}
   >
     <div className="bg-white bg-opacity-75 py-20 container mx-auto flex flex-col items-center text-center px-4 rounded-lg shadow-lg">
       <img

@@ -1,0 +1,167 @@
+// src/pages/CompaniesPage.tsx
+import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Company, CompanyResponse } from "../types/Company";
+import { CompanyFormInputs } from "../components/forms/CreateCompany";
+import CreateCompany from "../components/forms/CreateCompany";
+import { useNavigate } from "react-router-dom";
+import { isSessionExpired } from "../utils/session";
+import companyApi from "../api/companyApi";
+
+const CompaniesPage = () => {
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companiesWithRoles, setCompaniesWithRoles] = useState<
+    { company: Company; role: string }[]
+  >([]);
+
+  const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        // Clear user information and token from local storage
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("expirationTime");
+
+        // Redirect to login page
+        navigate("/login");
+      }
+    };
+
+    // Initial check
+    checkSession();
+
+    // Set interval to check session expiry every minute
+    const interval = setInterval(checkSession, 60000); // 1 minute
+
+    // Clean up interval on component unmount
+    return () => clearInterval(interval);
+  }, [navigate]);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const companiesData: CompanyResponse = await companyApi.getCompanies();
+        const companiesWithRoles = companiesData.data.companies.map(
+          (companyData) => ({
+            company: companyData.company,
+            role: companyData.role,
+          })
+        );
+        setCompaniesWithRoles(companiesWithRoles);
+      } catch (error) {
+        console.error("Error fetching companies:", error);
+      }
+    };
+
+    fetchCompanies();
+  }, [navigate, companiesWithRoles]);
+
+  const handleCreateCompany = (newCompanyInput: CompanyFormInputs) => {
+    const newCompany: Company = {
+      name: newCompanyInput.name,
+      description: "",
+      address: newCompanyInput.address,
+      phoneNumber: newCompanyInput.phone,
+      companyEmail: newCompanyInput.companyEmail,
+      id: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    setCompanies([...companies, newCompany]);
+    setShowCreateCompanyModal(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-200 flex items-center justify-center">
+      <div
+        className={`w-full p-8 bg-white rounded-lg shadow-lg ${
+          companiesWithRoles.length === 1
+            ? "max-w-lg"
+            : companiesWithRoles.length === 2
+            ? "max-w-xl"
+            : "max-w-6xl"
+        }`}
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-blue-900">Your Companies</h1>
+          <button
+            onClick={() => setShowCreateCompanyModal(true)}
+            className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700"
+          >
+            <FontAwesomeIcon icon={faPlus} className="mr-2" /> Create New
+            Company
+          </button>
+        </div>
+        {companiesWithRoles.length === 0 ? (
+          <p className="text-gray-600">
+            No companies found. Create a new company to get started.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {companiesWithRoles.map(({ company, role }, index) => (
+              <div
+                key={index}
+                className="bg-white p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              >
+                <h2 className="text-xl font-bold mb-2">{company.name}</h2>
+                <p className="text-gray-700 mb-4">{company.description}</p>
+                <div className="text-gray-600 text-sm">
+                  <p>
+                    <strong>Address:</strong> {company.address.street},{" "}
+                    {company.address.city}, {company.address.state},{" "}
+                    {company.address.country}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {company.phoneNumber}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {company.companyEmail}
+                  </p>
+                  <p>
+                    <strong>Role:</strong> {role}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {showCreateCompanyModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 relative">
+            <button
+              title="Close"
+              onClick={() => setShowCreateCompanyModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 8.586L3.707 2.293A1 1 0 002.293 3.707L8.586 10l-6.293 6.293a1 1 0 101.414 1.414L10 11.414l6.293 6.293a1 1 0 001.414-1.414L11.414 10l6.293-6.293a1 1 0 00-1.414-1.414L10 8.586z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+            <CreateCompany
+              onClose={() => setShowCreateCompanyModal(false)}
+              onCreate={handleCreateCompany}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CompaniesPage;

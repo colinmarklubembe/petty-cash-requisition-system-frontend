@@ -5,6 +5,7 @@ import Signup from "../pages/SignupPage";
 import RequisitionsPage from "../pages/RequisitionsPage";
 import Login from "../pages/LoginPage";
 import Dashboard from "../pages/Dashboard";
+import CompaniesPage from "../pages/CompaniesPage";
 
 const AppRoutes = () => (
   <Router>
@@ -14,6 +15,7 @@ const AppRoutes = () => (
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/companies" element={<CompaniesPage />} />
     </Routes>
   </Router>
 );

@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import icon1 from "../assets/logo-no-background.png";
+import icon2 from "../assets/logo-no-background.png";
+import icon3 from "../assets/logo-no-background.png";
 
 const FeaturesSection = () => (
   <section className="py-20 bg-gray-50">
@@ -13,7 +16,7 @@ const FeaturesSection = () => (
           <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
             <div className="mb-4 flex justify-center">
               <img
-                src="path-to-icon1.png"
+                src={icon1}
                 alt="Easy Management Icon"
                 className="w-16 h-16 text-blue-500"
               />
@@ -30,7 +33,7 @@ const FeaturesSection = () => (
           <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
             <div className="mb-4 flex justify-center">
               <img
-                src="path-to-icon2.png"
+                src={icon2}
                 alt="Real-Time Tracking Icon"
                 className="w-16 h-16 text-blue-500"
               />
@@ -47,7 +50,7 @@ const FeaturesSection = () => (
           <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
             <div className="mb-4 flex justify-center">
               <img
-                src="path-to-icon3.png"
+                src={icon3}
                 alt="Secure and Reliable Icon"
                 className="w-16 h-16 text-blue-500"
               />

@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { login } from "../api/authApi";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
-import { Link } from "react-router-dom";
-import background from "../assets/image/herobackground1.jpg"; 
+import { authApi } from "../api";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import { Link, useNavigate } from "react-router-dom";
+import background from "../assets/image/herobackground1.jpg";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -24,6 +24,7 @@ interface LoginFormInputs {
 const Login = () => {
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -38,8 +39,17 @@ const Login = () => {
     setToastMessage(null);
 
     try {
-      const response = await login(data);
+      const response = await authApi.login(data);
       setToastMessage(response.message);
+
+      // Store user information, token, and expiration time in local storage
+      const expirationTime = new Date().getTime() + 3600 * 1000; // 1 hour
+      localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("expirationTime", expirationTime.toString());
+
+      // Redirect to Companies page
+      navigate("/companies");
       console.log("Login successful", response);
     } catch (error: any) {
       const errorMessage =
@@ -52,8 +62,8 @@ const Login = () => {
   };
 
   return (
-    <div 
-      className="bg-cover bg-center min-h-screen flex items-center justify-center" 
+    <div
+      className="bg-cover bg-center min-h-screen flex items-center justify-center"
       style={{ backgroundImage: `url(${background})` }}
     >
       <div className="max-w-md w-full p-6 bg-white bg-opacity-80 rounded-lg shadow-lg">
@@ -108,10 +118,7 @@ const Login = () => {
           >
             {submitting ? (
               <span className="flex items-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-3"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
                     cx="12"

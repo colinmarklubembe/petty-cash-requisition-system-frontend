@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { signup } from "../api/authApi";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { authApi } from "../api";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import background from "../assets/image/herobackground1.jpg"; 
+import background from "../assets/image/herobackground1.jpg";
 
 const schema = yup.object().shape({
   firstName: yup.string().required("First name is required"),
@@ -35,7 +35,7 @@ const Signup = () => {
     setToastMessage(null);
 
     try {
-      const response = await signup(data);
+      const response = await authApi.signup(data);
       setToastMessage(response.message);
       console.log("Signup successful", response);
     } catch (error: any) {
@@ -49,8 +49,10 @@ const Signup = () => {
   };
 
   return (
-    <div className="bg-cover bg-center min-h-screen flex items-center justify-center" 
-    style={{ backgroundImage: `url(${background})` }}>
+    <div
+      className="bg-cover bg-center min-h-screen flex items-center justify-center"
+      style={{ backgroundImage: `url(${background})` }}
+    >
       <div className="max-w-md w-full p-6 bg-white bg-opacity-80 rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold mb-6 text-center text-blue-900">
           Signup
@@ -139,10 +141,7 @@ const Signup = () => {
           >
             {submitting ? (
               <span className="flex items-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-3"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
                     cx="12"

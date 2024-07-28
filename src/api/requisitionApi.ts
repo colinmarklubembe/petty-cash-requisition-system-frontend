@@ -9,6 +9,6 @@ class RequisitionService {
   };
 }
 
-const requisitionService = new RequisitionService();
+const requisitionApi = new RequisitionService();
 
-export default requisitionService;
+export default requisitionApi;

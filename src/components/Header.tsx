@@ -2,21 +2,21 @@ import { Link } from "react-router-dom";
 import logo from "../assets/logo-no-background.png";
 
 const Header = () => (
-  <header className="bg-blue-100 p-4 text-blue-900 sticky top-0 z-50 shadow-md">
+  <header className="bg-white p-4 shadow-md sticky top-0 z-50">
     <nav className="container mx-auto flex justify-between items-center">
       <div className="flex items-center">
-        <img src={logo} alt="CashFusion Logo" className="h-10 mr-3" />
+        <img src={logo} alt="CashFusion Logo" className="h-12 mr-3" />
       </div>
-      <div>
+      <div className="flex items-center space-x-4">
         <Link
           to="/login"
-          className="mr-4 px-4 py-2 border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white rounded-lg transition-colors"
+          className="px-4 py-2 border border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white rounded-full transition-colors text-lg font-medium"
         >
           Login
         </Link>
         <Link
           to="/signup"
-          className="px-4 py-2 bg-blue-900 text-white hover:bg-blue-800 rounded-lg transition-colors"
+          className="px-4 py-2 bg-orange-500 text-white hover:bg-orange-700 rounded-full transition-colors text-lg font-medium"
         >
           Signup
         </Link>

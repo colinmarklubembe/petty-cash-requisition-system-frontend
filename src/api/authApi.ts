@@ -2,27 +2,33 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/auth";
 
-export const signup = async (userData: {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}) => {
-  try {
-    const response = await axios.post(`${API_URL}/signup`, userData);
+class AuthApi {
+  signup = async (userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  }) => {
+    try {
+      const response = await axios.post(`${API_URL}/signup`, userData);
 
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
 
-export const login = async (userData: { email: string; password: string }) => {
-  try {
-    const response = await axios.post(`${API_URL}/login`, userData);
+  login = async (userData: { email: string; password: string }) => {
+    try {
+      const response = await axios.post(`${API_URL}/login`, userData);
 
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+}
+
+const authApi = new AuthApi();
+
+export default authApi;
