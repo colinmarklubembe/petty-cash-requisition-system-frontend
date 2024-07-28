@@ -76,6 +76,16 @@ const CompaniesPage = () => {
     setShowCreateCompanyModal(false);
   };
 
+  const handleCompanyClick = (companyId: string, role: string) => {
+    // Store companyId and role in local storage
+    localStorage.setItem("companyId", companyId);
+    localStorage.setItem("userRole", role);
+
+    // Navigate to the dashboard
+    navigate("/dashboard");
+    console.log("Clicked");
+  };
+
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center">
       <div
@@ -106,7 +116,8 @@ const CompaniesPage = () => {
             {companiesWithRoles.map(({ company, role }, index) => (
               <div
                 key={index}
-                className="bg-white p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                onClick={() => handleCompanyClick(company.id, role)}
+                className="bg-white p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
               >
                 <h2 className="text-xl font-bold mb-2">{company.name}</h2>
                 <p className="text-gray-700 mb-4">{company.description}</p>
