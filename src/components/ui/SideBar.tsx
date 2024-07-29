@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   FiHome,
+  FiDatabase,
   FiUser,
   FiSettings,
   FiLogOut,
@@ -44,6 +45,7 @@ const Sidebar = ({
         <ul>
           {[
             { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
+            { to: "/funds", icon: <FiDatabase />, label: "Funds" },
             {
               to: "/requisitions",
               icon: <FiClipboard />,

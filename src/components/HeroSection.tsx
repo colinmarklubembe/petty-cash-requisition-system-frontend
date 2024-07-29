@@ -9,7 +9,7 @@ const HeroSection = () => (
     className="bg-cover bg-center py-20"
     style={{ backgroundImage: `url(${background})` }}
   >
-    <div className="bg-white bg-opacity-75 py-20 container mx-auto flex flex-col items-center text-center px-4 rounded-lg shadow-lg">
+    <div className="bg-white bg-opacity-75 py-20 container mx-auto flex flex-col items-center text-center px-4 rounded-lg shadow-lg max-w-screen-xl">
       <img
         src={icon}
         alt="CashFusion Hero Img"

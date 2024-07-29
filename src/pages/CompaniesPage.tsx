@@ -1,4 +1,3 @@
-// src/pages/CompaniesPage.tsx
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -7,37 +6,29 @@ import { CompanyFormInputs } from "../components/forms/CreateCompany";
 import CreateCompany from "../components/forms/CreateCompany";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
-import companyApi from "../api/companyApi";
+import { companyApi } from "../api";
 
 const CompaniesPage = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [companiesWithRoles, setCompaniesWithRoles] = useState<
     { company: Company; role: string }[]
   >([]);
-
   const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
-        // Clear user information and token from local storage
         localStorage.removeItem("user");
         localStorage.removeItem("token");
         localStorage.removeItem("expirationTime");
-
-        // Redirect to login page
         navigate("/login");
       }
     };
 
-    // Initial check
     checkSession();
-
-    // Set interval to check session expiry every minute
     const interval = setInterval(checkSession, 60000); // 1 minute
 
-    // Clean up interval on component unmount
     return () => clearInterval(interval);
   }, [navigate]);
 
@@ -58,7 +49,7 @@ const CompaniesPage = () => {
     };
 
     fetchCompanies();
-  }, [navigate, companiesWithRoles, companies]);
+  }, [companies, companiesWithRoles]);
 
   const handleCreateCompany = (newCompanyInput: CompanyFormInputs) => {
     const newCompany: Company = {
@@ -77,26 +68,14 @@ const CompaniesPage = () => {
   };
 
   const handleCompanyClick = (companyId: string, role: string) => {
-    // Store companyId and role in local storage
     localStorage.setItem("companyId", companyId);
     localStorage.setItem("userRole", role);
-
-    // Navigate to the dashboard
     navigate("/dashboard");
-    console.log("Clicked");
   };
 
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center">
-      <div
-        className={`w-full p-8 bg-white rounded-lg shadow-lg ${
-          companiesWithRoles.length === 1
-            ? "max-w-lg"
-            : companiesWithRoles.length === 2
-            ? "max-w-xl"
-            : "max-w-6xl"
-        }`}
-      >
+      <div className="w-full p-8 bg-white rounded-lg shadow-lg max-w-6xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-blue-900">Your Companies</h1>
           <button
@@ -112,15 +91,26 @@ const CompaniesPage = () => {
             No companies found. Create a new company to get started.
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            className={`grid gap-8 ${
+              companiesWithRoles.length === 1
+                ? "grid-cols-1"
+                : companiesWithRoles.length === 2
+                ? "grid-cols-1 sm:grid-cols-2"
+                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            }`}
+          >
             {companiesWithRoles.map(({ company, role }, index) => (
               <div
                 key={index}
                 onClick={() => handleCompanyClick(company.id, role)}
                 className="bg-white p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                style={{ minHeight: "200px" }}
               >
                 <h2 className="text-xl font-bold mb-2">{company.name}</h2>
-                <p className="text-gray-700 mb-4">{company.description}</p>
+                <p className="text-gray-700 mb-4">
+                  {company.description || "No description available"}
+                </p>
                 <div className="text-gray-600 text-sm">
                   <p>
                     <strong>Address:</strong> {company.address.street},{" "}
