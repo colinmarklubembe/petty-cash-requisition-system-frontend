@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
@@ -12,6 +12,7 @@ import { FiBell, FiMenu, FiSettings, FiUser, FiX } from "react-icons/fi";
 import { PettyFund, PettyFundFormInputs } from "../types/PettyFund";
 import { pettyCashApi } from "../api";
 import CreatePettyFundForm from "../components/forms/CreatePettyFundForm";
+import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
 
 const PettyFundsPage: React.FC = () => {
   const [funds, setFunds] = useState<PettyFund[]>([]);
@@ -19,6 +20,8 @@ const PettyFundsPage: React.FC = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [activeFundId, setActiveFundId] = useState<string | null>(null);
   const [showCreateFundModal, setShowCreateFundModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
@@ -72,25 +75,30 @@ const PettyFundsPage: React.FC = () => {
     }
   };
 
+  const fetchPettyCashFunds = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await pettyCashApi.getPettyCashFunds();
+      setFunds(response.data.pettyCashFunds);
+    } catch (error) {
+      setError("Failed to fetch petty cash funds. Please try again.");
+      console.error("Failed to fetch petty cash funds: ", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPettyCashFunds();
+  }, [fetchPettyCashFunds]);
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  useEffect(() => {
-    const fetchPettyCashFunds = async () => {
-      try {
-        const response = await pettyCashApi.getPettyCashFunds();
-        setFunds(response.data.pettyCashFunds);
-      } catch (error) {
-        console.error("Failed to fetch petty cash funds: ", error);
-      }
-    };
-
-    fetchPettyCashFunds();
-  }, [funds]);
 
   // Function to handle conditional rendering
   const renderCell = (value: string | number | undefined | null) => {
@@ -197,99 +205,113 @@ const PettyFundsPage: React.FC = () => {
               </div>
             </div>
           )}
-          <div className="flex-grow">
-            <table className="min-w-full bg-white shadow-lg rounded-lg text-center">
-              <thead>
-                <tr>
-                  <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                    Fund
-                  </th>
-                  <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                    Current Balance(Ugx)
-                  </th>
-                  <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                    Total Spent(Ugx)
-                  </th>
-                  <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                    Total Added(Ugx)
-                  </th>
-                  <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {funds.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center flex-grow">
+              <RingLoader color="#F05A28" size={60} />
+            </div>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            <div className="flex-grow">
+              <table className="min-w-full bg-white shadow-lg rounded-lg text-center">
+                <thead>
                   <tr>
-                    <td colSpan={5} className="py-3 px-6 text-gray-600">
-                      No petty funds found. Create a new petty fund to get
-                      started.
-                    </td>
+                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
+                      Fund
+                    </th>
+                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
+                      Current Balance(Ugx)
+                    </th>
+                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
+                      Total Spent(Ugx)
+                    </th>
+                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
+                      Total Added(Ugx)
+                    </th>
+                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
+                      Actions
+                    </th>
                   </tr>
-                ) : (
-                  funds.map((fund) => (
-                    <tr key={fund.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-6">{renderCell(fund.name)}</td>
-                      <td className="py-3 px-6">
-                        {renderCell(fund.currentBalance)}
-                      </td>
-                      <td className="py-3 px-6">
-                        {renderCell(fund.totalSpent)}
-                      </td>
-                      <td className="py-3 px-6">
-                        {renderCell(fund.totalAdded)}
-                      </td>
-                      <td
-                        className="py-3 px-6 relative"
-                        ref={
-                          actionsRef as React.RefObject<HTMLTableDataCellElement>
-                        }
-                      >
-                        <button
-                          onClick={() =>
-                            setActiveFundId(
-                              activeFundId === fund.id ? null : fund.id
-                            )
-                          }
-                          className="focus:outline-none"
-                        >
-                          <FontAwesomeIcon icon={faEllipsisH} />
-                        </button>
-                        {activeFundId === fund.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                            <button
-                              onClick={() => handleViewFund(fund.id)}
-                              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                            >
-                              <FontAwesomeIcon icon={faEye} className="mr-2" />
-                              View
-                            </button>
-                            <button
-                              onClick={() => handleEditFund(fund.id)}
-                              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                            >
-                              <FontAwesomeIcon icon={faEdit} className="mr-2" />
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteFund(fund.id)}
-                              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                            >
-                              <FontAwesomeIcon
-                                icon={faTrashAlt}
-                                className="mr-2"
-                              />
-                              Delete
-                            </button>
-                          </div>
-                        )}
+                </thead>
+                <tbody>
+                  {funds.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-3 px-6 text-gray-600">
+                        No petty funds found. Create a new petty fund to get
+                        started.
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    funds.map((fund) => (
+                      <tr key={fund.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-6">{renderCell(fund.name)}</td>
+                        <td className="py-3 px-6">
+                          {renderCell(fund.currentBalance)}
+                        </td>
+                        <td className="py-3 px-6">
+                          {renderCell(fund.totalSpent)}
+                        </td>
+                        <td className="py-3 px-6">
+                          {renderCell(fund.totalAdded)}
+                        </td>
+                        <td
+                          className="py-3 px-6 relative"
+                          ref={
+                            actionsRef as React.RefObject<HTMLTableDataCellElement>
+                          }
+                        >
+                          <button
+                            onClick={() =>
+                              setActiveFundId(
+                                activeFundId === fund.id ? null : fund.id
+                              )
+                            }
+                            className="focus:outline-none"
+                          >
+                            <FontAwesomeIcon icon={faEllipsisH} />
+                          </button>
+                          {activeFundId === fund.id && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                              <button
+                                onClick={() => handleViewFund(fund.id)}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                              >
+                                <FontAwesomeIcon
+                                  icon={faEye}
+                                  className="mr-2"
+                                />
+                                View
+                              </button>
+                              <button
+                                onClick={() => handleEditFund(fund.id)}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                              >
+                                <FontAwesomeIcon
+                                  icon={faEdit}
+                                  className="mr-2"
+                                />
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteFund(fund.id)}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                              >
+                                <FontAwesomeIcon
+                                  icon={faTrashAlt}
+                                  className="mr-2"
+                                />
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </main>
       </div>
     </div>

@@ -1,13 +1,34 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/ui/SideBar";
 import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
+import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+
+  // Simulate data fetching
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Simulate data fetching
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      } catch (err: any) {
+        setError("Failed to load dashboard data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -69,45 +90,57 @@ const Dashboard = () => {
         </header>
 
         <main className="mt-6 p-6">
-          <h2 className="text-3xl font-bold mb-6 text-[#3886CE]">Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                Total Sales
-              </h3>
-              <p className="text-3xl font-bold text-[#F05A28]">$12,345</p>
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <RingLoader color="#F05A28" size={60} />
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                New Users
-              </h3>
-              <p className="text-3xl font-bold text-[#F05A28]">123</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                Active Users
-              </h3>
-              <p className="text-3xl font-bold text-[#F05A28]">456</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                Pending Orders
-              </h3>
-              <p className="text-3xl font-bold text-[#F05A28]">78</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                Revenue
-              </h3>
-              <p className="text-3xl font-bold text-[#F05A28]">$45,678</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                Expenses
-              </h3>
-              <p className="text-3xl font-bold text-[#F05A28]">$9,876</p>
-            </div>
-          </div>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            <>
+              <h2 className="text-3xl font-bold mb-6 text-[#3886CE]">
+                Overview
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
+                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
+                    Total Sales
+                  </h3>
+                  <p className="text-3xl font-bold text-[#F05A28]">$12,345</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
+                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
+                    New Users
+                  </h3>
+                  <p className="text-3xl font-bold text-[#F05A28]">123</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
+                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
+                    Active Users
+                  </h3>
+                  <p className="text-3xl font-bold text-[#F05A28]">456</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
+                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
+                    Pending Orders
+                  </h3>
+                  <p className="text-3xl font-bold text-[#F05A28]">78</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
+                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
+                    Revenue
+                  </h3>
+                  <p className="text-3xl font-bold text-[#F05A28]">$45,678</p>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
+                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
+                    Expenses
+                  </h3>
+                  <p className="text-3xl font-bold text-[#F05A28]">$9,876</p>
+                </div>
+              </div>
+            </>
+          )}
         </main>
       </div>
     </div>

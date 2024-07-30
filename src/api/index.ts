@@ -3,3 +3,4 @@ export { default as companyApi } from "./companyApi";
 export { default as authApi } from "./authApi";
 export { default as pettyCashApi } from "./pettyCashApi";
 export { default as approvalApi } from "./approvalApi";
+export { default as transactionApi } from "./transactionApi";

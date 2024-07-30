@@ -6,3 +6,6 @@ export { default as LoginPage } from "./LoginPage";
 export { default as PettyFundsPage } from "./PettyFundsPage";
 export { default as RequisitionsPage } from "./RequisitionsPage";
 export { default as SignupPage } from "./SignupPage";
+export { default as TransactionsPage } from "./TransactionsPage";
+export { default as UserManagementPage } from "./UserManagementPage";
+export { default as SettingsPage } from "./SettingsPage";

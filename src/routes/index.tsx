@@ -2,13 +2,14 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import {
   HomePage,
-  RequisitionsPage,
   Dashboard,
   SignupPage,
   LoginPage,
   CompaniesPage,
   PettyFundsPage,
   ApprovalsPage,
+  TransactionsPage,
+  RequisitionsPage,
 } from "../pages";
 
 const AppRoutes = () => (
@@ -22,6 +23,7 @@ const AppRoutes = () => (
       <Route path="/companies" element={<CompaniesPage />} />
       <Route path="/funds" element={<PettyFundsPage />} />
       <Route path="/approvals" element={<ApprovalsPage />} />
+      <Route path="/transactions" element={<TransactionsPage />} />
     </Routes>
   </Router>
 );

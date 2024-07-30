@@ -40,6 +40,20 @@ class RequisitionService {
 
     return response.data;
   };
+
+  getRequisitionById = async (requisitionId: string) => {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(
+      `${API_URL}/get-requisition/${requisitionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  };
 }
 
 const requisitionApi = new RequisitionService();

@@ -1,27 +1,27 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPlus,
-  faEllipsisH,
   faEdit,
   faTrashAlt,
+  faPlus,
+  faEllipsisH,
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
+import { FiMenu, FiX, FiBell, FiSettings, FiUser } from "react-icons/fi";
 import Sidebar from "../components/ui/SideBar";
-import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
-import CreateRequisition from "../components/forms/CreateRequisition";
-import { Requisition, RequisitionFormInputs } from "../types/Requisition";
-import { requisitionApi } from "../api";
+import { transactionApi } from "../api";
+import { Transaction, TransactionFormInputs } from "../types/Transaction";
+import CreateTransaction from "../components/forms/CreateTransaction";
 import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
 
-const RequisitionsPage: React.FC = () => {
-  const [requisitions, setRequisitions] = useState<Requisition[]>([]);
+const TransactionsPage: React.FC = () => {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [activeRequisitionId, setActiveRequisitionId] = useState<string | null>(
+  const [activeTransactionId, setActiveTransactionId] = useState<string | null>(
     null
   );
-  const [showCreateRequisitionModal, setShowCreateRequisitionModal] =
+  const [showCreateTransactionModal, setShowCreateTransactionModal] =
     useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,39 +29,56 @@ const RequisitionsPage: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
 
+  const fetchTransactions = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await transactionApi.getAllTransactions();
+      setTransactions(response.data.transactions);
+    } catch (error) {
+      setError("Failed to fetch transactions. Please try again.");
+      console.error("Failed to fetch transactions: ", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    setIsSidebarOpen((prev) => !prev);
   };
 
   const toggleDropdown = () => {
-    setDropdownOpen(!isDropdownOpen);
+    setDropdownOpen((prev) => !prev);
   };
 
-  const handleCreateRequisition = (newRequisition: RequisitionFormInputs) => {
-    const requisition: Requisition = {
+  const handleCreateTransaction = (newTransaction: TransactionFormInputs) => {
+    const transaction: Transaction = {
       id: "",
-      title: newRequisition.title,
-      description: newRequisition.description,
-      amount: newRequisition.amount,
-      requisitionStatus: "DRAFTS",
-      pettyCashFundId: newRequisition.pettyCashFundId,
-      pettyCashFund: null,
+      type: newTransaction.type,
+      amount: newTransaction.amount,
+      requisitionId: newTransaction.requisitionId,
+      requisition: undefined,
+      pettyCashFund: undefined,
     };
 
-    setRequisitions((prevRequisitions) => [...prevRequisitions, requisition]);
-    setShowCreateRequisitionModal(false);
+    setTransactions((prevTransactions) => [...prevTransactions, transaction]);
+    setShowCreateTransactionModal(false);
   };
 
-  const handleEditRequisition = (id: string) => {
-    // Logic to edit the requisition with the given id
+  const handleEditTransaction = (id: string) => {
+    // Logic to edit the transaction with the given id
   };
 
-  const handleDeleteRequisition = (id: string) => {
-    // Logic to delete the requisition with the given id
+  const handleDeleteTransaction = (id: string) => {
+    // Logic to delete the transaction with the given id
   };
 
-  const handleViewRequisition = (id: string) => {
-    // Logic to view the requisition with the given id
+  const handleViewTransaction = (id: string) => {
+    // Logic to view the transaction with the given id
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -75,27 +92,9 @@ const RequisitionsPage: React.FC = () => {
       actionsRef.current &&
       !actionsRef.current.contains(event.target as Node)
     ) {
-      setActiveRequisitionId(null);
+      setActiveTransactionId(null);
     }
   };
-
-  const fetchRequisitions = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await requisitionApi.getAllRequisitions();
-      setRequisitions(response.data.requisitions);
-    } catch (error) {
-      setError("Failed to fetch requisitions. Please try again.");
-      console.error("Failed to fetch requisitions: ", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchRequisitions();
-  }, [fetchRequisitions]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -103,18 +102,6 @@ const RequisitionsPage: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  // // Function to handle conditional rendering
-  // const renderCell = (value: string | number | undefined | null) => {
-  //   if (typeof value === "string") {
-  //     return value.trim() === "" ? "N/A" : value;
-  //   }
-
-  //   if (typeof value === "undefined") {
-  //     return "N/A";
-  //   }
-  //   return value === undefined || value === null ? 0 : value;
-  // };
 
   return (
     <div className="flex h-screen">
@@ -125,7 +112,7 @@ const RequisitionsPage: React.FC = () => {
         }`}
       >
         <header className="bg-[#F05A28] shadow-md p-4 flex justify-between items-center relative">
-          <h1 className="text-2xl font-bold text-[#FFFFFF]">Requisitions</h1>
+          <h1 className="text-2xl font-bold text-[#FFFFFF]">Transactions</h1>
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
@@ -177,18 +164,18 @@ const RequisitionsPage: React.FC = () => {
 
         <main className="p-6 flex flex-col h-full">
           <button
-            onClick={() => setShowCreateRequisitionModal(true)}
+            onClick={() => setShowCreateTransactionModal(true)}
             className="bg-orange-500 text-white py-2 px-4 rounded-full hover:bg-orange-700 transition-colors flex items-center mb-6 self-end"
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            Create Requisition
+            Create Transaction
           </button>
-          {showCreateRequisitionModal && (
+          {showCreateTransactionModal && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg relative">
                 <button
                   title="Close"
-                  onClick={() => setShowCreateRequisitionModal(false)}
+                  onClick={() => setShowCreateTransactionModal(false)}
                   className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                 >
                   <svg
@@ -204,9 +191,9 @@ const RequisitionsPage: React.FC = () => {
                     />
                   </svg>
                 </button>
-                <CreateRequisition
-                  onClose={() => setShowCreateRequisitionModal(false)}
-                  onCreate={handleCreateRequisition}
+                <CreateTransaction
+                  onClose={() => setShowCreateTransactionModal(false)}
+                  onCreate={handleCreateTransaction}
                 />
               </div>
             </div>
@@ -223,16 +210,16 @@ const RequisitionsPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Description
+                      Type
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
                       Amount
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Status
+                      Fund
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Fund
+                      Requisition
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
                       Actions
@@ -240,34 +227,26 @@ const RequisitionsPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {requisitions.length === 0 ? (
+                  {transactions.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="py-3 px-6 text-gray-600">
-                        No requisitions found. Create a new requisition to get
-                        started.
+                        No transactions available. Check back later.
                       </td>
                     </tr>
                   ) : (
-                    requisitions.map((req) => (
-                      <tr key={req.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3 px-6">{req.description}</td>
-                        <td className="py-3 px-6">{req.amount}</td>
+                    transactions.map((transaction) => (
+                      <tr
+                        key={transaction.id}
+                        className="border-b hover:bg-gray-50 transition-colors duration-300"
+                      >
+                        <td className="py-3 px-6">{transaction.type}</td>
+                        <td className="py-3 px-6">{transaction.amount}</td>
                         <td className="py-3 px-6">
-                          <span
-                            className={`py-1 px-3 rounded-full text-xs ${
-                              req.requisitionStatus === "APPROVED"
-                                ? "bg-green-200 text-green-800"
-                                : req.requisitionStatus === "PENDING"
-                                ? "bg-yellow-200 text-yellow-800"
-                                : req.requisitionStatus === "DRAFTS"
-                                ? "bg-gray-200 text-gray-800"
-                                : "bg-red-200 text-red-600"
-                            }`}
-                          >
-                            {req.requisitionStatus}
-                          </span>
+                          {transaction.pettyCashFund?.name || "N/A"}
                         </td>
-                        <td className="py-3 px-6">{req.pettyCashFund?.name}</td>
+                        <td className="py-3 px-6">
+                          {transaction.requisition?.title || "N/A"}
+                        </td>
                         <td
                           className="py-3 px-6 relative"
                           ref={
@@ -276,19 +255,23 @@ const RequisitionsPage: React.FC = () => {
                         >
                           <button
                             onClick={() =>
-                              setActiveRequisitionId(
-                                activeRequisitionId === req.id ? null : req.id
+                              setActiveTransactionId(
+                                activeTransactionId === transaction.id
+                                  ? null
+                                  : transaction.id
                               )
                             }
                             className="focus:outline-none"
                           >
                             <FontAwesomeIcon icon={faEllipsisH} />
                           </button>
-                          {activeRequisitionId === req.id && (
+                          {activeTransactionId === transaction.id && (
                             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                               <button
-                                onClick={() => handleViewRequisition(req.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                onClick={() =>
+                                  handleViewTransaction(transaction.id)
+                                }
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
                               >
                                 <FontAwesomeIcon
                                   icon={faEye}
@@ -297,8 +280,10 @@ const RequisitionsPage: React.FC = () => {
                                 View
                               </button>
                               <button
-                                onClick={() => handleEditRequisition(req.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                onClick={() =>
+                                  handleEditTransaction(transaction.id)
+                                }
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
                               >
                                 <FontAwesomeIcon
                                   icon={faEdit}
@@ -307,8 +292,10 @@ const RequisitionsPage: React.FC = () => {
                                 Edit
                               </button>
                               <button
-                                onClick={() => handleDeleteRequisition(req.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                onClick={() =>
+                                  handleDeleteTransaction(transaction.id)
+                                }
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
                               >
                                 <FontAwesomeIcon
                                   icon={faTrashAlt}
@@ -332,4 +319,4 @@ const RequisitionsPage: React.FC = () => {
   );
 };
 
-export default RequisitionsPage;
+export default TransactionsPage;
