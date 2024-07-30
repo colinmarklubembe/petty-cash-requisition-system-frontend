@@ -234,7 +234,7 @@ const RequisitionsPage: React.FC = () => {
                               ? "bg-yellow-200 text-yellow-800"
                               : req.requisitionStatus === "DRAFTS"
                               ? "bg-gray-200 text-gray-800"
-                              : "bg-gray-100 text-gray-600"
+                              : "bg-red-200 text-red-600"
                           }`}
                         >
                           {req.requisitionStatus}
