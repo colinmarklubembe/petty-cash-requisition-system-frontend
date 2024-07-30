@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/ui/SideBar";
 import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
-import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
+import { RingLoader } from "react-spinners";
+import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
+import "chart.js/auto";
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -29,6 +31,129 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
+
+  // Detailed data for charts
+  const requisitionOverviewData = {
+    labels: ["Pending", "Approved", "Rejected", "Under Review"],
+    datasets: [
+      {
+        data: [15, 35, 10, 5],
+        backgroundColor: ["#FFCE56", "#36A2EB", "#FF6384", "#4BC0C0"],
+        hoverBackgroundColor: ["#FFCE56", "#36A2EB", "#FF6384", "#4BC0C0"],
+      },
+    ],
+  };
+
+  const fundBalanceData = {
+    labels: [
+      "Initial Amount",
+      "Current Balance",
+      "Total Expenditures",
+      "Available Balance",
+    ],
+    datasets: [
+      {
+        data: [2000, 1500, 400, 1000],
+        backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384", "#4BC0C0"],
+        borderColor: ["#36A2EB", "#FFCE56", "#FF6384", "#4BC0C0"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const monthlyExpendituresData = {
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+    datasets: [
+      {
+        label: "Monthly Expenditures",
+        data: [250, 300, 200, 400, 350, 450, 300, 500, 400, 600, 550, 700],
+        backgroundColor: "#FF6384",
+        borderColor: "#FF6384",
+        borderWidth: 2,
+        fill: false,
+      },
+    ],
+  };
+
+  const monthlyRequisitionsData = {
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+    datasets: [
+      {
+        label: "Monthly Requisitions",
+        data: [20, 25, 30, 40, 35, 50, 45, 60, 55, 70, 65, 80],
+        backgroundColor: "#36A2EB",
+        borderColor: "#36A2EB",
+        borderWidth: 2,
+        fill: false,
+      },
+    ],
+  };
+
+  const topCategoriesData = {
+    labels: [
+      "Office Supplies",
+      "Travel",
+      "Meals",
+      "Entertainment",
+      "Miscellaneous",
+    ],
+    datasets: [
+      {
+        label: "Top Categories",
+        data: [500, 300, 200, 150, 100],
+        backgroundColor: [
+          "#FFCE56",
+          "#FF6384",
+          "#36A2EB",
+          "#4BC0C0",
+          "#8E5EA2",
+        ],
+      },
+    ],
+  };
+
+  const spendingByDepartmentData = {
+    labels: ["HR", "Finance", "IT", "Marketing", "Sales"],
+    datasets: [
+      {
+        label: "Spending by Department",
+        data: [2000, 1500, 1800, 1700, 1600],
+        backgroundColor: [
+          "#FFCE56",
+          "#FF6384",
+          "#36A2EB",
+          "#4BC0C0",
+          "#8E5EA2",
+        ],
+      },
+    ],
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -104,39 +229,39 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
                   <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Total Sales
+                    Requisition Overview
                   </h3>
-                  <p className="text-3xl font-bold text-[#F05A28]">$12,345</p>
+                  <Pie data={requisitionOverviewData} />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
                   <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    New Users
+                    Fund Balance
                   </h3>
-                  <p className="text-3xl font-bold text-[#F05A28]">123</p>
+                  <Doughnut data={fundBalanceData} />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
                   <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Active Users
+                    Monthly Expenditures
                   </h3>
-                  <p className="text-3xl font-bold text-[#F05A28]">456</p>
+                  <Line data={monthlyExpendituresData} />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
                   <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Pending Orders
+                    Monthly Requisitions
                   </h3>
-                  <p className="text-3xl font-bold text-[#F05A28]">78</p>
+                  <Bar data={monthlyRequisitionsData} />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
                   <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Revenue
+                    Top Categories
                   </h3>
-                  <p className="text-3xl font-bold text-[#F05A28]">$45,678</p>
+                  <Doughnut data={topCategoriesData} />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
                   <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Expenses
+                    Spending by Department
                   </h3>
-                  <p className="text-3xl font-bold text-[#F05A28]">$9,876</p>
+                  <Bar data={spendingByDepartmentData} />
                 </div>
               </div>
             </>
