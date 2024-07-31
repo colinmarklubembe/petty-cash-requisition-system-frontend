@@ -9,3 +9,5 @@ export { default as SignupPage } from "./SignupPage";
 export { default as TransactionsPage } from "./TransactionsPage";
 export { default as UserManagementPage } from "./UserManagementPage";
 export { default as SettingsPage } from "./SettingsPage";
+export { default as ReportsPage } from "./ReportsPage";
+export { default as NotFoundPage } from "./NotFoundPage";

@@ -12,6 +12,8 @@ import {
   RequisitionsPage,
   SettingsPage,
   UserManagementPage,
+  ReportsPage,
+  NotFoundPage,
 } from "../pages";
 
 const AppRoutes = () => (
@@ -28,6 +30,8 @@ const AppRoutes = () => (
       <Route path="/transactions" element={<TransactionsPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/users" element={<UserManagementPage />} />
+      <Route path="/reports" element={<ReportsPage />} />
+      <Route path="/not-found" element={<NotFoundPage />} />
     </Routes>
   </Router>
 );
