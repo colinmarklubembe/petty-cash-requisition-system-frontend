@@ -105,7 +105,7 @@ const UserManagementPage = () => {
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div
         className={`flex-1 transition-all duration-300 ${
-          isSidebarOpen ? "ml-64" : "ml-16"
+          isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
         <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">

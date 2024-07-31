@@ -1,79 +1,67 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faEdit,
-  faTrashAlt,
   faPlus,
   faEllipsisH,
+  faEdit,
+  faTrashAlt,
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
-import { FiMenu, FiX, FiBell, FiSettings, FiUser } from "react-icons/fi";
 import Sidebar from "../components/ui/SideBar";
-import { reportApi } from "../api";
-import { Report, ReportFormInputs } from "../types/Report";
-import CreateReport from "../components/forms/CreateReport";
-import { RingLoader } from "react-spinners";
+import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
+import CreateRequisition from "../components/forms/CreateRequisition";
+import { Requisition, RequisitionFormInputs } from "../types/Requisition";
+import { requisitionApi } from "../api";
+import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
 
-const ReportsPage: React.FC = () => {
-  const [reports, setReports] = useState<Report[]>([]);
+const RequisitionsPage: React.FC = () => {
+  const [requisitions, setRequisitions] = useState<Requisition[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [activeReportId, setActiveReportId] = useState<string | null>(null);
-  const [showCreateReportModal, setShowCreateReportModal] = useState(false);
+  const [activeRequisitionId, setActiveRequisitionId] = useState<string | null>(
+    null
+  );
+  const [showCreateRequisitionModal, setShowCreateRequisitionModal] =
+    useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchReports = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await reportApi.getAllReports();
-      setReports(response.data.reports);
-    } catch (error) {
-      setError("Failed to fetch reports. Please try again.");
-      console.error("Failed to fetch reports: ", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
-
   const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev);
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
+    setDropdownOpen(!isDropdownOpen);
   };
 
-  const handleCreateReport = (newReport: ReportFormInputs) => {
-    const report: Report = {
+  const handleCreateRequisition = (newRequisition: RequisitionFormInputs) => {
+    const requisition: Requisition = {
       id: "",
-      title: newReport.title,
-      content: newReport.content,
-      createdAt: new Date().toISOString(),
+      title: newRequisition.title,
+      description: newRequisition.description,
+      amount: newRequisition.amount,
+      requisitionStatus: "DRAFTS",
+      pettyCashFundId: newRequisition.pettyCashFundId,
+      pettyCashFund: null,
     };
 
-    setReports((prevReports) => [...prevReports, report]);
-    setShowCreateReportModal(false);
+    setRequisitions((prevRequisitions) => [...prevRequisitions, requisition]);
+    setShowCreateRequisitionModal(false);
   };
 
-  const handleEditReport = (id: string) => {
-    // Logic to edit the report with the given id
+  const handleEditRequisition = (id: string) => {
+    // Logic to edit the requisition with the given id
   };
 
-  const handleDeleteReport = (id: string) => {
-    // Logic to delete the report with the given id
+  const handleDeleteRequisition = (id: string) => {
+    // Logic to delete the requisition with the given id
   };
 
-  const handleViewReport = (id: string) => {
-    // Logic to view the report with the given id
+  const handleViewRequisition = (id: string) => {
+    // Logic to view the requisition with the given id
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -87,9 +75,27 @@ const ReportsPage: React.FC = () => {
       actionsRef.current &&
       !actionsRef.current.contains(event.target as Node)
     ) {
-      setActiveReportId(null);
+      setActiveRequisitionId(null);
     }
   };
+
+  const fetchRequisitions = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await requisitionApi.getAllRequisitions();
+      setRequisitions(response.data.requisitions);
+    } catch (error) {
+      setError("Failed to fetch requisitions. Please try again.");
+      console.error("Failed to fetch requisitions: ", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRequisitions();
+  }, [fetchRequisitions]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -98,16 +104,28 @@ const ReportsPage: React.FC = () => {
     };
   }, []);
 
+  // // Function to handle conditional rendering
+  // const renderCell = (value: string | number | undefined | null) => {
+  //   if (typeof value === "string") {
+  //     return value.trim() === "" ? "N/A" : value;
+  //   }
+
+  //   if (typeof value === "undefined") {
+  //     return "N/A";
+  //   }
+  //   return value === undefined || value === null ? 0 : value;
+  // };
+
   return (
     <div className="flex h-screen">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div
         className={`flex-1 transition-all duration-300 ${
-          isSidebarOpen ? "ml-64" : "ml-16"
+          isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
         <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
-          <h1 className="text-3xl font-bold text-white">Reports</h1>
+          <h1 className="text-3xl font-bold text-white">Requisitions</h1>
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
@@ -159,18 +177,18 @@ const ReportsPage: React.FC = () => {
 
         <main className="p-6 flex flex-col h-full">
           <button
-            onClick={() => setShowCreateReportModal(true)}
+            onClick={() => setShowCreateRequisitionModal(true)}
             className="bg-orange-500 text-white py-2 px-4 rounded-full hover:bg-orange-700 transition-colors flex items-center mb-6 self-end"
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            Create Report
+            Create Requisition
           </button>
-          {showCreateReportModal && (
+          {showCreateRequisitionModal && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg relative">
                 <button
                   title="Close"
-                  onClick={() => setShowCreateReportModal(false)}
+                  onClick={() => setShowCreateRequisitionModal(false)}
                   className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                 >
                   <svg
@@ -186,9 +204,9 @@ const ReportsPage: React.FC = () => {
                     />
                   </svg>
                 </button>
-                <CreateReport
-                  onClose={() => setShowCreateReportModal(false)}
-                  onCreate={handleCreateReport}
+                <CreateRequisition
+                  onClose={() => setShowCreateRequisitionModal(false)}
+                  onCreate={handleCreateRequisition}
                 />
               </div>
             </div>
@@ -205,10 +223,16 @@ const ReportsPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Title
+                      Description
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Created At
+                      Amount
+                    </th>
+                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
+                      Status
+                    </th>
+                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
+                      Fund
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
                       Actions
@@ -216,22 +240,34 @@ const ReportsPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {reports.length === 0 ? (
+                  {requisitions.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className="py-3 px-6 text-gray-600">
-                        No reports available. Check back later.
+                      <td colSpan={5} className="py-3 px-6 text-gray-600">
+                        No requisitions found. Create a new requisition to get
+                        started.
                       </td>
                     </tr>
                   ) : (
-                    reports.map((report) => (
-                      <tr
-                        key={report.id}
-                        className="border-b hover:bg-gray-50 transition-colors duration-300"
-                      >
-                        <td className="py-3 px-6">{report.title}</td>
+                    requisitions.map((req) => (
+                      <tr key={req.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-6">{req.description}</td>
+                        <td className="py-3 px-6">{req.amount}</td>
                         <td className="py-3 px-6">
-                          {new Date(report.createdAt).toLocaleDateString()}
+                          <span
+                            className={`py-1 px-3 rounded-full text-xs ${
+                              req.requisitionStatus === "APPROVED"
+                                ? "bg-green-200 text-green-800"
+                                : req.requisitionStatus === "PENDING"
+                                ? "bg-yellow-200 text-yellow-800"
+                                : req.requisitionStatus === "DRAFTS"
+                                ? "bg-gray-200 text-gray-800"
+                                : "bg-red-200 text-red-600"
+                            }`}
+                          >
+                            {req.requisitionStatus}
+                          </span>
                         </td>
+                        <td className="py-3 px-6">{req.pettyCashFund?.name}</td>
                         <td
                           className="py-3 px-6 relative"
                           ref={
@@ -240,19 +276,19 @@ const ReportsPage: React.FC = () => {
                         >
                           <button
                             onClick={() =>
-                              setActiveReportId(
-                                activeReportId === report.id ? null : report.id
+                              setActiveRequisitionId(
+                                activeRequisitionId === req.id ? null : req.id
                               )
                             }
                             className="focus:outline-none"
                           >
                             <FontAwesomeIcon icon={faEllipsisH} />
                           </button>
-                          {activeReportId === report.id && (
+                          {activeRequisitionId === req.id && (
                             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                               <button
-                                onClick={() => handleViewReport(report.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                                onClick={() => handleViewRequisition(req.id)}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                               >
                                 <FontAwesomeIcon
                                   icon={faEye}
@@ -261,8 +297,8 @@ const ReportsPage: React.FC = () => {
                                 View
                               </button>
                               <button
-                                onClick={() => handleEditReport(report.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                                onClick={() => handleEditRequisition(req.id)}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                               >
                                 <FontAwesomeIcon
                                   icon={faEdit}
@@ -271,8 +307,8 @@ const ReportsPage: React.FC = () => {
                                 Edit
                               </button>
                               <button
-                                onClick={() => handleDeleteReport(report.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                                onClick={() => handleDeleteRequisition(req.id)}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                               >
                                 <FontAwesomeIcon
                                   icon={faTrashAlt}
@@ -296,4 +332,4 @@ const ReportsPage: React.FC = () => {
   );
 };
 
-export default ReportsPage;
+export default RequisitionsPage;

@@ -14,9 +14,7 @@ const Dashboard = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   // Simulate data fetching
   useEffect(() => {
@@ -163,7 +161,6 @@ const Dashboard = () => {
     datasets: [
       {
         label: "Spending by Department",
-
         data: [2000, 1500, 1800, 1700, 1600],
         backgroundColor: [
           "#FFCE56",
@@ -181,8 +178,8 @@ const Dashboard = () => {
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div
         className={`flex-1 transition-all duration-300 ${
-          isSidebarOpen ? "ml-64" : "ml-16"
-        }`}
+          isSidebarOpen ? "ml-56" : "ml-12"
+        }`} // Adjust margin based on sidebar width
       >
         <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
@@ -256,7 +253,10 @@ const Dashboard = () => {
                 </h3>
                 <Doughnut data={fundBalanceData} />
               </div>
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div
+                className="bg-white p-6 rounded-lg shadow-md hover
+transition-shadow"
+              >
                 <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
                   <FiUser className="mr-2" /> Monthly Expenditures
                 </h3>

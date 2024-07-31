@@ -40,6 +40,12 @@ class PettyCashApi {
 
     return response.data;
   };
+
+  getPettyCashFundById = async (id: string) => {
+    const response = await axios.get(`${API_URL}/fund/${id}`);
+
+    return response.data;
+  };
 }
 
 const pettyCashApi = new PettyCashApi();

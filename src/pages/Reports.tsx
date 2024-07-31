@@ -9,43 +9,41 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FiMenu, FiX, FiBell, FiSettings, FiUser } from "react-icons/fi";
 import Sidebar from "../components/ui/SideBar";
-import { transactionApi } from "../api";
-import { Transaction, TransactionFormInputs } from "../types/Transaction";
-import CreateTransaction from "../components/forms/CreateTransaction";
-import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
+import { reportApi } from "../api";
+import { Report, ReportFormInputs } from "../types/Report";
+import CreateReport from "../components/forms/CreateReport";
+import { RingLoader } from "react-spinners";
 
-const TransactionsPage: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+const ReportsPage: React.FC = () => {
+  const [reports, setReports] = useState<Report[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [activeTransactionId, setActiveTransactionId] = useState<string | null>(
-    null
-  );
-  const [showCreateTransactionModal, setShowCreateTransactionModal] =
-    useState(false);
+  const [activeReportId, setActiveReportId] = useState<string | null>(null);
+  const [showCreateReportModal, setShowCreateReportModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<boolean | string>(false); // track loading state for actions
   const [error, setError] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchTransactions = useCallback(async () => {
+  const fetchReports = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await transactionApi.getAllTransactions();
-      setTransactions(response.data.transactions);
+      const response = await reportApi.getAllReports();
+      setReports(response.data.reports);
     } catch (error) {
-      setError("Failed to fetch transactions. Please try again.");
-      console.error("Failed to fetch transactions: ", error);
+      setError("Failed to fetch reports. Please try again.");
+      console.error("Failed to fetch reports: ", error);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    fetchReports();
+  }, [fetchReports]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -55,30 +53,64 @@ const TransactionsPage: React.FC = () => {
     setDropdownOpen((prev) => !prev);
   };
 
-  const handleCreateTransaction = (newTransaction: TransactionFormInputs) => {
-    const transaction: Transaction = {
-      id: "",
-      type: newTransaction.type,
-      amount: newTransaction.amount,
-      requisitionId: newTransaction.requisitionId,
-      requisition: undefined,
-      pettyCashFund: undefined,
-    };
+  const handleCreateReport = async (newReport: ReportFormInputs) => {
+    setActionLoading("create"); // Set loading state for creating report
+    try {
+      const report: Report = {
+        id: "",
+        title: newReport.title,
+        content: newReport.content,
+        createdAt: new Date().toISOString(),
+      };
 
-    setTransactions((prevTransactions) => [...prevTransactions, transaction]);
-    setShowCreateTransactionModal(false);
+      // Simulate a delay or API call
+      setReports((prevReports) => [...prevReports, report]);
+      setShowCreateReportModal(false);
+    } catch (error) {
+      setError("Failed to create report. Please try again.");
+      console.error("Failed to create report: ", error);
+    } finally {
+      setActionLoading(false); // Reset action loading state
+    }
   };
 
-  const handleEditTransaction = (id: string) => {
-    // Logic to edit the transaction with the given id
+  const handleEditReport = async (id: string) => {
+    setActionLoading(id); // Set loading state for editing report
+    try {
+      // Simulate an API call to edit the report
+    } catch (error) {
+      setError("Failed to edit report. Please try again.");
+      console.error("Failed to edit report: ", error);
+    } finally {
+      setActionLoading(false); // Reset action loading state
+    }
   };
 
-  const handleDeleteTransaction = (id: string) => {
-    // Logic to delete the transaction with the given id
+  const handleDeleteReport = async (id: string) => {
+    setActionLoading(id); // Set loading state for deleting report
+    try {
+      // Simulate an API call to delete the report
+      setReports((prevReports) =>
+        prevReports.filter((report) => report.id !== id)
+      );
+    } catch (error) {
+      setError("Failed to delete report. Please try again.");
+      console.error("Failed to delete report: ", error);
+    } finally {
+      setActionLoading(false); // Reset action loading state
+    }
   };
 
-  const handleViewTransaction = (id: string) => {
-    // Logic to view the transaction with the given id
+  const handleViewReport = async (id: string) => {
+    setActionLoading(id); // Set loading state for viewing report
+    try {
+      // Simulate an API call to view the report
+    } catch (error) {
+      setError("Failed to view report. Please try again.");
+      console.error("Failed to view report: ", error);
+    } finally {
+      setActionLoading(false); // Reset action loading state
+    }
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -92,7 +124,7 @@ const TransactionsPage: React.FC = () => {
       actionsRef.current &&
       !actionsRef.current.contains(event.target as Node)
     ) {
-      setActiveTransactionId(null);
+      setActiveReportId(null);
     }
   };
 
@@ -108,11 +140,11 @@ const TransactionsPage: React.FC = () => {
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div
         className={`flex-1 transition-all duration-300 ${
-          isSidebarOpen ? "ml-64" : "ml-16"
+          isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
         <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
-          <h1 className="text-3xl font-bold text-white">Transactions</h1>
+          <h1 className="text-3xl font-bold text-white">Reports</h1>
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
@@ -164,18 +196,18 @@ const TransactionsPage: React.FC = () => {
 
         <main className="p-6 flex flex-col h-full">
           <button
-            onClick={() => setShowCreateTransactionModal(true)}
+            onClick={() => setShowCreateReportModal(true)}
             className="bg-orange-500 text-white py-2 px-4 rounded-full hover:bg-orange-700 transition-colors flex items-center mb-6 self-end"
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            Create Transaction
+            Create Report
           </button>
-          {showCreateTransactionModal && (
+          {showCreateReportModal && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg relative">
                 <button
                   title="Close"
-                  onClick={() => setShowCreateTransactionModal(false)}
+                  onClick={() => setShowCreateReportModal(false)}
                   className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                 >
                   <svg
@@ -191,9 +223,9 @@ const TransactionsPage: React.FC = () => {
                     />
                   </svg>
                 </button>
-                <CreateTransaction
-                  onClose={() => setShowCreateTransactionModal(false)}
-                  onCreate={handleCreateTransaction}
+                <CreateReport
+                  onClose={() => setShowCreateReportModal(false)}
+                  onCreate={handleCreateReport}
                 />
               </div>
             </div>
@@ -210,16 +242,10 @@ const TransactionsPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Type
+                      Title
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Amount
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Fund
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Requisition
+                      Created At
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
                       Actions
@@ -227,25 +253,21 @@ const TransactionsPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {transactions.length === 0 ? (
+                  {reports.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-3 px-6 text-gray-600">
-                        No transactions available. Check back later.
+                      <td colSpan={3} className="py-3 px-6 text-gray-600">
+                        No reports available. Check back later.
                       </td>
                     </tr>
                   ) : (
-                    transactions.map((transaction) => (
+                    reports.map((report) => (
                       <tr
-                        key={transaction.id}
+                        key={report.id}
                         className="border-b hover:bg-gray-50 transition-colors duration-300"
                       >
-                        <td className="py-3 px-6">{transaction.type}</td>
-                        <td className="py-3 px-6">{transaction.amount}</td>
+                        <td className="py-3 px-6">{report.title}</td>
                         <td className="py-3 px-6">
-                          {transaction.pettyCashFund?.name || "N/A"}
-                        </td>
-                        <td className="py-3 px-6">
-                          {transaction.requisition?.title || "N/A"}
+                          {new Date(report.createdAt).toLocaleDateString()}
                         </td>
                         <td
                           className="py-3 px-6 relative"
@@ -255,54 +277,56 @@ const TransactionsPage: React.FC = () => {
                         >
                           <button
                             onClick={() =>
-                              setActiveTransactionId(
-                                activeTransactionId === transaction.id
-                                  ? null
-                                  : transaction.id
+                              setActiveReportId(
+                                activeReportId === report.id ? null : report.id
                               )
                             }
                             className="focus:outline-none"
                           >
                             <FontAwesomeIcon icon={faEllipsisH} />
                           </button>
-                          {activeTransactionId === transaction.id && (
+                          {activeReportId === report.id && (
                             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                              <button
-                                onClick={() =>
-                                  handleViewTransaction(transaction.id)
-                                }
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                              >
-                                <FontAwesomeIcon
-                                  icon={faEye}
-                                  className="mr-2"
-                                />
-                                View
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleEditTransaction(transaction.id)
-                                }
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                              >
-                                <FontAwesomeIcon
-                                  icon={faEdit}
-                                  className="mr-2"
-                                />
-                                Edit
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleDeleteTransaction(transaction.id)
-                                }
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                              >
-                                <FontAwesomeIcon
-                                  icon={faTrashAlt}
-                                  className="mr-2"
-                                />
-                                Delete
-                              </button>
+                              {actionLoading === report.id ? (
+                                <div className="flex items-center justify-center p-2">
+                                  <RingLoader color="#F05A28" size={30} />
+                                </div>
+                              ) : (
+                                <>
+                                  <button
+                                    onClick={() => handleViewReport(report.id)}
+                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={faEye}
+                                      className="mr-2"
+                                    />
+                                    View
+                                  </button>
+                                  <button
+                                    onClick={() => handleEditReport(report.id)}
+                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={faEdit}
+                                      className="mr-2"
+                                    />
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteReport(report.id)
+                                    }
+                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={faTrashAlt}
+                                      className="mr-2"
+                                    />
+                                    Delete
+                                  </button>
+                                </>
+                              )}
                             </div>
                           )}
                         </td>
@@ -319,4 +343,4 @@ const TransactionsPage: React.FC = () => {
   );
 };
 
-export default TransactionsPage;
+export default ReportsPage;
