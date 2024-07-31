@@ -10,6 +10,8 @@ import {
   ApprovalsPage,
   TransactionsPage,
   RequisitionsPage,
+  SettingsPage,
+  UserManagementPage,
 } from "../pages";
 
 const AppRoutes = () => (
@@ -24,6 +26,8 @@ const AppRoutes = () => (
       <Route path="/funds" element={<PettyFundsPage />} />
       <Route path="/approvals" element={<ApprovalsPage />} />
       <Route path="/transactions" element={<TransactionsPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/users" element={<UserManagementPage />} />
     </Routes>
   </Router>
 );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/ui/SideBar";
 import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
 import { RingLoader } from "react-spinners";
@@ -11,8 +11,12 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
 
   // Simulate data fetching
   useEffect(() => {
@@ -30,6 +34,22 @@ const Dashboard = () => {
     };
 
     fetchData();
+  }, []);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   // Detailed data for charts
@@ -143,6 +163,7 @@ const Dashboard = () => {
     datasets: [
       {
         label: "Spending by Department",
+
         data: [2000, 1500, 1800, 1700, 1600],
         backgroundColor: [
           "#FFCE56",
@@ -163,9 +184,9 @@ const Dashboard = () => {
           isSidebarOpen ? "ml-64" : "ml-16"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#F05A28] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
               className="text-white hover:text-gray-200 focus:outline-none"
@@ -187,7 +208,7 @@ const Dashboard = () => {
                 type="button"
                 aria-label="Notifications"
                 title="Notifications"
-                className="flex items-center space-x-2 hover:text-[#F05A28] transition-colors"
+                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
               >
                 <FiBell className="h-6 w-6" />
                 <span className="text-sm">Notifications</span>
@@ -196,7 +217,7 @@ const Dashboard = () => {
                 type="button"
                 aria-label="Settings"
                 title="Settings"
-                className="flex items-center space-x-2 hover:text-[#F05A28] transition-colors"
+                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
               >
                 <FiSettings className="h-6 w-6" />
                 <span className="text-sm">Settings</span>
@@ -205,7 +226,7 @@ const Dashboard = () => {
                 type="button"
                 aria-label="User profile"
                 title="User profile"
-                className="flex items-center space-x-2 hover:text-[#F05A28] transition-colors"
+                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
               >
                 <FiUser className="h-6 w-6" />
                 <span className="text-sm">Profile</span>
@@ -217,51 +238,49 @@ const Dashboard = () => {
         <main className="mt-6 p-6">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <RingLoader color="#F05A28" size={60} />
+              <RingLoader color="#FE633D" size={60} />
             </div>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Requisition Overview
-                  </h3>
-                  <Pie data={requisitionOverviewData} />
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Fund Balance
-                  </h3>
-                  <Doughnut data={fundBalanceData} />
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Monthly Expenditures
-                  </h3>
-                  <Line data={monthlyExpendituresData} />
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Monthly Requisitions
-                  </h3>
-                  <Bar data={monthlyRequisitionsData} />
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Top Categories
-                  </h3>
-                  <Doughnut data={topCategoriesData} />
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-                  <h3 className="text-xl font-semibold mb-4 text-[#202046]">
-                    Spending by Department
-                  </h3>
-                  <Bar data={spendingByDepartmentData} />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
+                  <FiUser className="mr-2" /> Requisition Overview
+                </h3>
+                <Pie data={requisitionOverviewData} />
               </div>
-            </>
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
+                  <FiUser className="mr-2" /> Fund Balance
+                </h3>
+                <Doughnut data={fundBalanceData} />
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
+                  <FiUser className="mr-2" /> Monthly Expenditures
+                </h3>
+                <Line data={monthlyExpendituresData} />
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
+                  <FiUser className="mr-2" /> Monthly Requisitions
+                </h3>
+                <Bar data={monthlyRequisitionsData} />
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
+                  <FiUser className="mr-2" /> Top Categories
+                </h3>
+                <Doughnut data={topCategoriesData} />
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
+                  <FiUser className="mr-2" /> Spending by Department
+                </h3>
+                <Bar data={spendingByDepartmentData} />
+              </div>
+            </div>
           )}
         </main>
       </div>

@@ -60,7 +60,7 @@ const Sidebar = ({
             { to: "/reports", icon: <FiBarChart2 />, label: "Reports" },
             { to: "/settings", icon: <FiSettings />, label: "Settings" },
             {
-              to: "/user-management",
+              to: "/users",
               icon: <FiUser />,
               label: "User Management",
             },

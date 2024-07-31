@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Company, CompanyResponse } from "../types/Company";
@@ -15,6 +15,20 @@ const CompaniesPage = () => {
   >([]);
   const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
   const navigate = useNavigate();
+  const formRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (formRef.current && !formRef.current.contains(event.target as Node)) {
+      setShowCreateCompanyModal(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const checkSession = () => {
@@ -49,7 +63,7 @@ const CompaniesPage = () => {
     };
 
     fetchCompanies();
-  }, [companies, companiesWithRoles]);
+  }, [companies]);
 
   const handleCreateCompany = (newCompanyInput: CompanyFormInputs) => {
     const newCompany: Company = {
@@ -77,10 +91,10 @@ const CompaniesPage = () => {
     <div className="min-h-screen bg-gray-200 flex items-center justify-center">
       <div className="w-full p-8 bg-white rounded-lg shadow-lg max-w-6xl">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-900">Your Companies</h1>
+          <h1 className="text-3xl font-bold text-[#202046]">Your Companies</h1>
           <button
             onClick={() => setShowCreateCompanyModal(true)}
-            className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700"
+            className="flex items-center bg-[#202046] text-white px-4 py-2 rounded-full hover:bg-[#F05A28]"
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" /> Create New
             Company
@@ -104,10 +118,12 @@ const CompaniesPage = () => {
               <div
                 key={index}
                 onClick={() => handleCompanyClick(company.id, role)}
-                className="bg-white p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                className="bg-white p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer border border-[#202046]"
                 style={{ minHeight: "200px" }}
               >
-                <h2 className="text-xl font-bold mb-2">{company.name}</h2>
+                <h2 className="text-xl font-bold mb-2 text-[#202046]">
+                  {company.name}
+                </h2>
                 <p className="text-gray-700 mb-4">
                   {company.description || "No description available"}
                 </p>
@@ -135,7 +151,10 @@ const CompaniesPage = () => {
 
       {showCreateCompanyModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 relative">
+          <div
+            className="bg-white p-4 rounded-lg shadow-lg w-1/2 md:w-1/3 relative"
+            ref={formRef}
+          >
             <button
               title="Close"
               onClick={() => setShowCreateCompanyModal(false)}

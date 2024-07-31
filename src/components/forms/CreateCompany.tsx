@@ -77,27 +77,27 @@ const CreateCompany: React.FC<CreateCompanyProps> = ({ onClose, onCreate }) => {
   };
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold mb-6 text-center text-blue-900">
+    <div className="max-w-lg mx-auto p-4 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-center text-[#202046]">
         Create Company
       </h2>
       {toastMessage && (
-        <div className="mb-6 p-3 rounded bg-blue-100 text-blue-700">
+        <div className="mb-4 p-3 rounded bg-[#FEE5E0] text-[#F05A28]">
           {toastMessage}
         </div>
       )}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-2 gap-6">
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium">
+        <div className="grid grid-cols-1 gap-4">
+          <div className="mb-4">
+            <label className="block text-[#202046] text-sm font-medium">
               Company Name
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
+            <div className="flex items-center border border-gray-300 rounded-lg mt-1">
               <span className="px-3">
-                <FontAwesomeIcon icon={faBuilding} className="text-blue-900" />
+                <FontAwesomeIcon icon={faBuilding} className="text-[#F05A28]" />
               </span>
               <input
-                className="w-full p-3 focus:outline-none"
+                className="w-full p-2 focus:outline-none"
                 placeholder="Enter company name"
                 {...register("name")}
               />
@@ -105,104 +105,106 @@ const CreateCompany: React.FC<CreateCompanyProps> = ({ onClose, onCreate }) => {
             <p className="text-red-600 text-sm mt-1">{errors.name?.message}</p>
           </div>
 
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium">
-              Street
-            </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
-              <span className="px-3">
-                <FontAwesomeIcon
-                  icon={faMapMarkerAlt}
-                  className="text-blue-900"
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="mb-4">
+              <label className="block text-[#202046] text-sm font-medium">
+                Street
+              </label>
+              <div className="flex items-center border border-gray-300 rounded-lg mt-1">
+                <span className="px-3">
+                  <FontAwesomeIcon
+                    icon={faMapMarkerAlt}
+                    className="text-[#F05A28]"
+                  />
+                </span>
+                <input
+                  className="w-full p-2 focus:outline-none"
+                  placeholder="Enter street"
+                  {...register("address.street")}
                 />
-              </span>
-              <input
-                className="w-full p-3 focus:outline-none"
-                placeholder="Enter street"
-                {...register("address.street")}
-              />
+              </div>
+              <p className="text-red-600 text-sm mt-1">
+                {errors.address?.street?.message}
+              </p>
             </div>
-            <p className="text-red-600 text-sm mt-1">
-              {errors.address?.street?.message}
-            </p>
+
+            <div className="mb-4">
+              <label className="block text-[#202046] text-sm font-medium">
+                City
+              </label>
+              <div className="flex items-center border border-gray-300 rounded-lg mt-1">
+                <span className="px-3">
+                  <FontAwesomeIcon
+                    icon={faMapMarkerAlt}
+                    className="text-[#F05A28]"
+                  />
+                </span>
+                <input
+                  className="w-full p-2 focus:outline-none"
+                  placeholder="Enter city"
+                  {...register("address.city")}
+                />
+              </div>
+              <p className="text-red-600 text-sm mt-1">
+                {errors.address?.city?.message}
+              </p>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-[#202046] text-sm font-medium">
+                State
+              </label>
+              <div className="flex items-center border border-gray-300 rounded-lg mt-1">
+                <span className="px-3">
+                  <FontAwesomeIcon
+                    icon={faMapMarkerAlt}
+                    className="text-[#F05A28]"
+                  />
+                </span>
+                <input
+                  className="w-full p-2 focus:outline-none"
+                  placeholder="Enter state"
+                  {...register("address.state")}
+                />
+              </div>
+              <p className="text-red-600 text-sm mt-1">
+                {errors.address?.state?.message}
+              </p>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-[#202046] text-sm font-medium">
+                Country
+              </label>
+              <div className="flex items-center border border-gray-300 rounded-lg mt-1">
+                <span className="px-3">
+                  <FontAwesomeIcon
+                    icon={faMapMarkerAlt}
+                    className="text-[#F05A28]"
+                  />
+                </span>
+                <input
+                  className="w-full p-2 focus:outline-none"
+                  placeholder="Enter country"
+                  {...register("address.country")}
+                />
+              </div>
+              <p className="text-red-600 text-sm mt-1">
+                {errors.address?.country?.message}
+              </p>
+            </div>
           </div>
 
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium">
-              City
-            </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
-              <span className="px-3">
-                <FontAwesomeIcon
-                  icon={faMapMarkerAlt}
-                  className="text-blue-900"
-                />
-              </span>
-              <input
-                className="w-full p-3 focus:outline-none"
-                placeholder="Enter city"
-                {...register("address.city")}
-              />
-            </div>
-            <p className="text-red-600 text-sm mt-1">
-              {errors.address?.city?.message}
-            </p>
-          </div>
-
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium">
-              State
-            </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
-              <span className="px-3">
-                <FontAwesomeIcon
-                  icon={faMapMarkerAlt}
-                  className="text-blue-900"
-                />
-              </span>
-              <input
-                className="w-full p-3 focus:outline-none"
-                placeholder="Enter state"
-                {...register("address.state")}
-              />
-            </div>
-            <p className="text-red-600 text-sm mt-1">
-              {errors.address?.state?.message}
-            </p>
-          </div>
-
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium">
-              Country
-            </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
-              <span className="px-3">
-                <FontAwesomeIcon
-                  icon={faMapMarkerAlt}
-                  className="text-blue-900"
-                />
-              </span>
-              <input
-                className="w-full p-3 focus:outline-none"
-                placeholder="Enter country"
-                {...register("address.country")}
-              />
-            </div>
-            <p className="text-red-600 text-sm mt-1">
-              {errors.address?.country?.message}
-            </p>
-          </div>
-
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium">
+          <div className="mb-4">
+            <label className="block text-[#202046] text-sm font-medium">
               Phone
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
+            <div className="flex items-center border border-gray-300 rounded-lg mt-1">
               <span className="px-3">
-                <FontAwesomeIcon icon={faPhone} className="text-blue-900" />
+                <FontAwesomeIcon icon={faPhone} className="text-[#F05A28]" />
               </span>
               <input
-                className="w-full p-3 focus:outline-none"
+                className="w-full p-2 focus:outline-none"
                 placeholder="Enter phone number"
                 {...register("phone")}
               />
@@ -210,16 +212,16 @@ const CreateCompany: React.FC<CreateCompanyProps> = ({ onClose, onCreate }) => {
             <p className="text-red-600 text-sm mt-1">{errors.phone?.message}</p>
           </div>
 
-          <div className="mb-5">
-            <label className="block text-gray-700 text-sm font-medium">
+          <div className="mb-4">
+            <label className="block text-[#202046] text-sm font-medium">
               Company Email
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
+            <div className="flex items-center border border-gray-300 rounded-lg mt-1">
               <span className="px-3">
-                <FontAwesomeIcon icon={faEnvelope} className="text-blue-900" />
+                <FontAwesomeIcon icon={faEnvelope} className="text-[#F05A28]" />
               </span>
               <input
-                className="w-full p-3 focus:outline-none"
+                className="w-full p-2 focus:outline-none"
                 placeholder="Enter company email"
                 {...register("companyEmail")}
               />
@@ -231,7 +233,7 @@ const CreateCompany: React.FC<CreateCompanyProps> = ({ onClose, onCreate }) => {
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-full hover:bg-blue-700 transition duration-300"
+          className="w-full bg-[#202046] text-white py-2 rounded-lg hover:bg-[#161631] transition-colors"
           disabled={submitting}
         >
           {submitting ? "Creating..." : "Create Company"}

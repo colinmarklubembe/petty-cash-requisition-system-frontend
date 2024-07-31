@@ -124,54 +124,54 @@ const RequisitionsPage: React.FC = () => {
           isSidebarOpen ? "ml-64" : "ml-16"
         }`}
       >
-        <header className="bg-[#F05A28] shadow-md p-4 flex justify-between items-center relative">
-          <h1 className="text-2xl font-bold text-[#FFFFFF]">Requisitions</h1>
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+          <h1 className="text-3xl font-bold text-white">Requisitions</h1>
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
-              className="text-white hover:text-[#FEE5E0] focus:outline-none"
+              className="text-white hover:text-gray-200 focus:outline-none"
               aria-label="Menu"
               title="Menu"
             >
               {isDropdownOpen ? (
-                <FiX className="h-6 w-6" />
+                <FiX className="h-8 w-8" />
               ) : (
-                <FiMenu className="h-6 w-6" />
+                <FiMenu className="h-8 w-8" />
               )}
             </button>
-            {isDropdownOpen && (
-              <div
-                className={`absolute top-full right-0 mt-2 bg-white text-black rounded-lg shadow-lg p-4 flex flex-col space-y-2`}
+            <div
+              className={`absolute top-full right-0 mt-2 bg-white text-black rounded-lg shadow-lg p-4 flex flex-col space-y-2 transition-transform transform ${
+                isDropdownOpen ? "scale-100 opacity-100" : "scale-75 opacity-0"
+              }`}
+            >
+              <button
+                type="button"
+                aria-label="Notifications"
+                title="Notifications"
+                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
               >
-                <button
-                  type="button"
-                  aria-label="Notifications"
-                  title="Notifications"
-                  className="flex items-center space-x-2 hover:text-[#F05A28]"
-                >
-                  <FiBell className="h-6 w-6" />
-                  <span className="text-sm">Notifications</span>
-                </button>
-                <button
-                  type="button"
-                  aria-label="Settings"
-                  title="Settings"
-                  className="flex items-center space-x-2 hover:text-[#F05A28]"
-                >
-                  <FiSettings className="h-6 w-6" />
-                  <span className="text-sm">Settings</span>
-                </button>
-                <button
-                  type="button"
-                  aria-label="User profile"
-                  title="User profile"
-                  className="flex items-center space-x-2 hover:text-[#F05A28]"
-                >
-                  <FiUser className="h-6 w-6" />
-                  <span className="text-sm">Profile</span>
-                </button>
-              </div>
-            )}
+                <FiBell className="h-6 w-6" />
+                <span className="text-sm">Notifications</span>
+              </button>
+              <button
+                type="button"
+                aria-label="Settings"
+                title="Settings"
+                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
+              >
+                <FiSettings className="h-6 w-6" />
+                <span className="text-sm">Settings</span>
+              </button>
+              <button
+                type="button"
+                aria-label="User profile"
+                title="User profile"
+                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
+              >
+                <FiUser className="h-6 w-6" />
+                <span className="text-sm">Profile</span>
+              </button>
+            </div>
           </div>
         </header>
 
