@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/companies";
+const API_URL = `${process.env.REACT_APP_BASE_URL!}/companies`;
 
 class CompanyApi {
   getCompanies = async () => {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/requisitions";
+const API_URL = `${process.env.REACT_APP_BASE_URL!}/requisitions`;
 
 class ApprovalApi {
   approveRequisition = async (requisitionId: string) => {
