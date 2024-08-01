@@ -12,7 +12,9 @@ import Sidebar from "../components/ui/SideBar";
 import { transactionApi } from "../api";
 import { Transaction, TransactionFormInputs } from "../types/Transaction";
 import CreateTransaction from "../components/forms/CreateTransaction";
-import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
+import { RingLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
+import { isSessionExpired } from "../utils/session";
 
 const TransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -25,6 +27,7 @@ const TransactionsPage: React.FC = () => {
     useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
@@ -95,6 +98,20 @@ const TransactionsPage: React.FC = () => {
       setActiveTransactionId(null);
     }
   };
+
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, [navigate]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);

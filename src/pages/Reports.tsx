@@ -13,6 +13,8 @@ import { reportApi } from "../api";
 import { Report, ReportFormInputs } from "../types/Report";
 import CreateReport from "../components/forms/CreateReport";
 import { RingLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
+import { isSessionExpired } from "../utils/session";
 
 const ReportsPage: React.FC = () => {
   const [reports, setReports] = useState<Report[]>([]);
@@ -23,6 +25,7 @@ const ReportsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<boolean | string>(false); // track loading state for actions
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
@@ -40,6 +43,20 @@ const ReportsPage: React.FC = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, [navigate]);
 
   useEffect(() => {
     fetchReports();

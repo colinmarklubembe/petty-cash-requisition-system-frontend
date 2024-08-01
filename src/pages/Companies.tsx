@@ -33,9 +33,7 @@ const CompaniesPage = () => {
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        localStorage.removeItem("expirationTime");
+        localStorage.clear();
         navigate("/login");
       }
     };

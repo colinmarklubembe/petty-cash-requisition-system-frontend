@@ -16,6 +16,8 @@ import CreatePettyFundForm from "../components/forms/CreatePettyFundForm";
 import PettyFundDetailView from "../components/views/PettyFund";
 import Modal from "../components/ui/Modal";
 import { RingLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
+import { isSessionExpired } from "../utils/session";
 
 const PettyFundsPage: React.FC = () => {
   const [funds, setFunds] = useState<PettyFund[]>([]);
@@ -26,6 +28,7 @@ const PettyFundsPage: React.FC = () => {
   const [selectedFund, setSelectedFund] = useState<PettyFund | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
@@ -78,6 +81,20 @@ const PettyFundsPage: React.FC = () => {
       setActiveFundId(null);
     }
   };
+
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, [navigate]);
 
   const fetchPettyCashFunds = useCallback(async () => {
     setLoading(true);

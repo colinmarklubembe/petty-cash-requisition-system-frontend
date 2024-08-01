@@ -4,17 +4,33 @@ import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
 import { RingLoader } from "react-spinners";
 import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
 import "chart.js/auto";
+import { useNavigate } from "react-router-dom";
+import { isSessionExpired } from "../utils/session";
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, [navigate]);
 
   // Simulate data fetching
   useEffect(() => {

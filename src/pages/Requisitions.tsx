@@ -12,9 +12,12 @@ import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
 import CreateRequisition from "../components/forms/CreateRequisition";
 import { Requisition, RequisitionFormInputs } from "../types/Requisition";
 import { requisitionApi } from "../api";
-import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
+import { RingLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
+import { isSessionExpired } from "../utils/session";
 
 const RequisitionsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -92,6 +95,20 @@ const RequisitionsPage: React.FC = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, [navigate]);
 
   useEffect(() => {
     fetchRequisitions();

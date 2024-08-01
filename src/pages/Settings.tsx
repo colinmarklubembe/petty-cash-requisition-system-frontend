@@ -9,12 +9,15 @@ import {
   FiLock,
 } from "react-icons/fi";
 import { Tab } from "@headlessui/react";
-import { RingLoader } from "react-spinners"; // Importing the spinner component for loading
+import { RingLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
+import { isSessionExpired } from "../utils/session";
 
 const SettingsPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [loading, setLoading] = useState(true); // Adding loading state
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -29,6 +32,20 @@ const SettingsPage = () => {
       setDropdownOpen(false);
     }
   };
+
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, [navigate]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
