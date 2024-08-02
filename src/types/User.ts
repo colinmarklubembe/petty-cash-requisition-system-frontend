@@ -10,8 +10,8 @@ export interface User {
 }
 
 export interface UserCompany {
-  userId: string;
-  companyId: string;
+  userId: string | undefined;
+  companyId: string | undefined;
   role: string;
   user: User;
 }

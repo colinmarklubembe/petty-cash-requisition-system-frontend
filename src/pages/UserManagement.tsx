@@ -81,17 +81,19 @@ const UserManagementPage = () => {
 
   const handleInviteUser = async (newUserInput: InviteUserFormInputs) => {
     try {
-      // Create a new user object
-      const newUser = {
-        email: newUserInput.email,
-        firstName: newUserInput.firstName,
-        lastName: newUserInput.lastName,
+      const newUser: UserCompany = {
+        user: {
+          email: newUserInput.email,
+          firstName: newUserInput.firstName,
+          middleName: "",
+          lastName: newUserInput.lastName,
+          id: "",
+          userCompanies: undefined,
+        },
+        userId: "",
+        companyId: "",
         role: newUserInput.role,
-        id: "",
       };
-
-      // Call the API to invite the user
-      await userApi.inviteUser(newUserInput);
 
       // Update the state with the new user
       setUsers((prevUsers: any) => [...prevUsers, newUser]);
@@ -175,7 +177,7 @@ const UserManagementPage = () => {
         <main className="mt-6 p-6">
           <button
             onClick={() => setShowInviteUserModal(true)}
-            className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
+            className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D] mb-6"
           >
             Invite User
           </button>
@@ -216,47 +218,49 @@ const UserManagementPage = () => {
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
-            <>
-              <section className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow mb-6">
-                <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                  <FiUser className="mr-2" /> Manage Users
-                </h2>
-                <table className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-                  <thead>
-                    <tr className="bg-[#202046] text-white">
-                      <th className="py-2 px-4 text-left">Name</th>
-                      <th className="py-2 px-4 text-left">Email</th>
-                      <th className="py-2 px-4 text-left">Role</th>
-                      <th className="py-2 px-4 text-left">Actions</th>
+            <section className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow mb-6">
+              <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
+                <FiUser className="mr-2" /> Manage Users
+              </h2>
+              <table className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                  <tr className="bg-[#202046] text-white">
+                    <th className="py-2 px-4 text-left">Name</th>
+                    <th className="py-2 px-4 text-left">Email</th>
+                    <th className="py-2 px-4 text-left">Role</th>
+                    <th className="py-2 px-4 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user, index) => (
+                    <tr
+                      key={user.user.id}
+                      className={`${
+                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                      } border-t hover:bg-gray-100`}
+                    >
+                      <td className="py-2 px-4">{`${user.user.firstName} ${user.user.lastName}`}</td>
+                      <td className="py-2 px-4">{user.user.email}</td>
+                      <td className="py-2 px-4">{user.role}</td>
+                      <td className="py-2 px-4 flex space-x-4">
+                        <button
+                          onClick={() => handleEditUser(user.user.id)}
+                          className="text-blue-600 hover:underline flex items-center"
+                        >
+                          <FiEdit className="mr-1" /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user.user.id)}
+                          className="text-red-600 hover:underline flex items-center"
+                        >
+                          <FiTrash2 className="mr-1" /> Delete
+                        </button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((user) => (
-                      <tr key={user.user.id} className="border-t">
-                        <td className="py-2 px-4">{`${user.user.firstName} ${user.user.lastName}`}</td>
-                        <td className="py-2 px-4">{user.user.email}</td>
-                        <td className="py-2 px-4">{user.role}</td>
-                        <td className="py-2 px-4">
-                          <button
-                            onClick={() => handleEditUser(user.user.id)}
-                            className="text-blue-600 hover:underline"
-                          >
-                            <FiEdit />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteUser(user.user.id)}
-                            className="text-red-600 hover:underline ml-4"
-                          >
-                            <FiTrash2 />
-                          </button>
-                          {/* Add role assignment here if needed */}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </section>
-            </>
+                  ))}
+                </tbody>
+              </table>
+            </section>
           )}
         </main>
       </div>

@@ -4,12 +4,17 @@ const API_URL = `${process.env.REACT_APP_BASE_URL!}/auth`;
 
 class SettingsApi {
   updateProfile = async (userData: {
-    email: string;
     firstName: string;
+    middleName: string;
     lastName: string;
+    phoneNumber: string;
   }) => {
     try {
-      const response = await axios.put(`${API_URL}/profile`, userData);
+      const response = await axios.put(`${API_URL}/update-profile`, userData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       return response.data;
     } catch (error) {
@@ -26,6 +31,20 @@ class SettingsApi {
       const response = await axios.put(`${API_URL}/change-password`, userData, {
         headers: {
           Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getUser = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/user`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
