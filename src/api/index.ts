@@ -5,3 +5,4 @@ export { default as pettyCashApi } from "./pettyCashFund";
 export { default as approvalApi } from "./approval";
 export { default as transactionApi } from "./transaction";
 export { default as reportApi } from "./report";
+export { default as settingsApi } from "./settings";
