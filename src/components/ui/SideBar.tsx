@@ -65,7 +65,7 @@ const Sidebar = ({
                   to={to}
                   className={`flex items-center px-3 py-3 rounded-md transition-colors ${
                     isActive
-                      ? "bg-[#303056]"
+                      ? "bg-[#FE633D]"
                       : isSidebarOpen
                       ? "hover:bg-transparent hover:border hover:border-white"
                       : "group-hover:border group-hover:border-white"
@@ -91,6 +91,7 @@ const Sidebar = ({
           })}
         </ul>
       </nav>
+      
     </aside>
   );
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/ui/SideBar";
-import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
+import { FiBell, FiSettings, FiUser, FiMenu, FiX, FiDollarSign, FiTrendingUp, FiClipboard, FiFileText, FiPieChart, FiBriefcase } from "react-icons/fi";
 import { RingLoader } from "react-spinners";
 import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
 import "chart.js/auto";
@@ -197,7 +197,7 @@ const Dashboard = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`} // Adjust margin based on sidebar width
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative sticky top-0 z-50">
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
           <div className="relative" ref={dropdownRef}>
             <button
@@ -249,56 +249,55 @@ const Dashboard = () => {
         </header>
 
         <main className="mt-6 p-6">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <RingLoader color="#FE633D" size={60} />
-            </div>
-          ) : error ? (
-            <p className="text-red-500">{error}</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                  <FiUser className="mr-2" /> Requisition Overview
-                </h3>
-                <Pie data={requisitionOverviewData} />
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                  <FiUser className="mr-2" /> Fund Balance
-                </h3>
-                <Doughnut data={fundBalanceData} />
-              </div>
-              <div
-                className="bg-white p-6 rounded-lg shadow-md hover
-transition-shadow"
-              >
-                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                  <FiUser className="mr-2" /> Monthly Expenditures
-                </h3>
-                <Line data={monthlyExpendituresData} />
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                  <FiUser className="mr-2" /> Monthly Requisitions
-                </h3>
-                <Bar data={monthlyRequisitionsData} />
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                  <FiUser className="mr-2" /> Top Categories
-                </h3>
-                <Doughnut data={topCategoriesData} />
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                  <FiUser className="mr-2" /> Spending by Department
-                </h3>
-                <Bar data={spendingByDepartmentData} />
-              </div>
-            </div>
-          )}
-        </main>
+  {loading ? (
+    <div className="flex items-center justify-center h-full">
+      <RingLoader color="#FE633D" size={60} />
+    </div>
+  ) : error ? (
+    <p className="text-red-500">{error}</p>
+  ) : (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Cards with equal size */}
+      <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+        <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
+          <FiDollarSign className="mr-2 text-[#FE633D]" /> Fund Balance
+        </h3>
+        <Doughnut data={fundBalanceData} />
+      </div>
+      <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+        <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
+          <FiTrendingUp className="mr-2 text-[#FE633D]" /> Monthly Expenditures
+        </h3>
+        <Line data={monthlyExpendituresData} />
+      </div>
+      <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+        <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
+          <FiClipboard className="mr-2 text-[#FE633D]" /> Requisition Overview
+        </h3>
+        <Pie data={requisitionOverviewData} />
+      </div>
+      <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+        <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
+          <FiFileText className="mr-2 text-[#FE633D]" /> Monthly Requisitions
+        </h3>
+        <Bar data={monthlyRequisitionsData} />
+      </div>
+      <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+        <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
+          <FiPieChart className="mr-2 text-[#FE633D]" /> Top Categories
+        </h3>
+        <Doughnut data={topCategoriesData} />
+      </div>
+      <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+        <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
+          <FiBriefcase className="mr-2 text-[#FE633D]" /> Spending by Department
+        </h3>
+        <Bar data={spendingByDepartmentData} />
+      </div>
+    </div>
+  )}
+</main>
+
       </div>
     </div>
   );
