@@ -9,14 +9,21 @@ import {
   FiLock,
 } from "react-icons/fi";
 import { Tab } from "@headlessui/react";
-import { RingLoader } from "react-spinners";
+import { RingLoader, PulseLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
+import settingsApi from "../api/settings";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SettingsPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
   const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -30,6 +37,40 @@ const SettingsPage = () => {
       !dropdownRef.current.contains(event.target as Node)
     ) {
       setDropdownOpen(false);
+    }
+  };
+
+  const handleChangePassword = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const userData = { oldPassword, newPassword };
+
+    if (newPassword !== confirmNewPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    if (newPassword === oldPassword) {
+      toast.error("New password must be different from old password");
+      return;
+    }
+
+    setIsSubmitting(true); // Set loading state to true
+
+    try {
+      const response = await settingsApi.updatePassword(userData);
+      toast.success("Password changed successfully");
+      setOldPassword(""); // Clear input fields
+      setNewPassword("");
+      setConfirmNewPassword("");
+      console.log(response);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.error ||
+          "Failed to update password! Please try again later"
+      );
+      console.error(error);
+    } finally {
+      setIsSubmitting(false); // Reset loading state
     }
   };
 
@@ -180,19 +221,10 @@ const SettingsPage = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
-                          Email
+                          Email Address
                         </label>
                         <input
                           type="email"
-                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Phone Number
-                        </label>
-                        <input
-                          type="tel"
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>
@@ -200,7 +232,7 @@ const SettingsPage = () => {
                         type="submit"
                         className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
                       >
-                        Save Changes
+                        Update Profile
                       </button>
                     </form>
                   </Tab.Panel>
@@ -209,66 +241,22 @@ const SettingsPage = () => {
                     <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
                       <FiBell className="mr-2" /> Notification Settings
                     </h2>
-                    <form className="space-y-4">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="emailNotifications"
-                          className="h-4 w-4 text-[#3886CE] border-gray-300 rounded focus:ring-[#3886CE]"
-                        />
-                        <label
-                          htmlFor="emailNotifications"
-                          className="ml-2 block text-sm font-medium text-gray-700"
-                        >
-                          Email Notifications
-                        </label>
-                      </div>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="smsNotifications"
-                          className="h-4 w-4 text-[#3886CE] border-gray-300 rounded focus:ring-[#3886CE]"
-                        />
-                        <label
-                          htmlFor="smsNotifications"
-                          className="ml-2 block text-sm font-medium text-gray-700"
-                        >
-                          SMS Notifications
-                        </label>
-                      </div>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="pushNotifications"
-                          className="h-4 w-4 text-[#3886CE] border-gray-300 rounded focus:ring-[#3886CE]"
-                        />
-                        <label
-                          htmlFor="pushNotifications"
-                          className="ml-2 block text-sm font-medium text-gray-700"
-                        >
-                          Push Notifications
-                        </label>
-                      </div>
-                      <button
-                        type="submit"
-                        className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
-                      >
-                        Save Changes
-                      </button>
-                    </form>
+                    {/* Notification settings form */}
                   </Tab.Panel>
 
                   <Tab.Panel className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                      <FiLock className="mr-2" /> Account Security
+                      <FiLock className="mr-2" /> Change Password
                     </h2>
-                    <form className="space-y-4">
+                    <form className="space-y-4" onSubmit={handleChangePassword}>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
-                          Current Password
+                          Old Password
                         </label>
                         <input
                           type="password"
+                          value={oldPassword}
+                          onChange={(e) => setOldPassword(e.target.value)}
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>
@@ -278,6 +266,8 @@ const SettingsPage = () => {
                         </label>
                         <input
                           type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>
@@ -287,14 +277,30 @@ const SettingsPage = () => {
                         </label>
                         <input
                           type="password"
+                          value={confirmNewPassword}
+                          onChange={(e) =>
+                            setConfirmNewPassword(e.target.value)
+                          }
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>
                       <button
                         type="submit"
-                        className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
+                        disabled={isSubmitting} // Disable button when submitting
+                        className="relative bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
                       >
-                        Change Password
+                        <span
+                          className={`${
+                            isSubmitting ? "opacity-0" : "opacity-100"
+                          } transition-opacity duration-300`}
+                        >
+                          Change Password
+                        </span>
+                        {isSubmitting && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <PulseLoader color="#ffffff" size={10} margin={4} />
+                          </div>
+                        )}
                       </button>
                     </form>
                   </Tab.Panel>
@@ -304,6 +310,7 @@ const SettingsPage = () => {
           )}
         </main>
       </div>
+      <ToastContainer />
     </div>
   );
 };
