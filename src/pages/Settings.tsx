@@ -20,10 +20,17 @@ const SettingsPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState({
+    id: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    phoneNumber: "",
+  });
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -54,12 +61,12 @@ const SettingsPage = () => {
       return;
     }
 
-    setIsSubmitting(true); // Set loading state to true
+    setIsSubmitting(true);
 
     try {
       const response = await settingsApi.updatePassword(userData);
       toast.success("Password changed successfully");
-      setOldPassword(""); // Clear input fields
+      setOldPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
       console.log(response);
@@ -70,9 +77,43 @@ const SettingsPage = () => {
       );
       console.error(error);
     } finally {
-      setIsSubmitting(false); // Reset loading state
+      setIsSubmitting(false);
     }
   };
+
+  const handleUpdateProfile = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await settingsApi.updateProfile(profile);
+      toast.success("Profile updated successfully");
+      console.log(response);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.error ||
+          "Failed to update profile! Please try again later"
+      );
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await settingsApi.getUser();
+        setProfile(response.data);
+      } catch (error) {
+        console.error("Failed to fetch profile data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
 
   useEffect(() => {
     const checkSession = () => {
@@ -209,13 +250,20 @@ const SettingsPage = () => {
                     <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
                       <FiUser className="mr-2" /> Profile Settings
                     </h2>
-                    <form className="space-y-4">
+                    <form className="space-y-4" onSubmit={handleUpdateProfile}>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
                           First Name
                         </label>
                         <input
                           type="text"
+                          value={profile.firstName}
+                          onChange={(e) =>
+                            setProfile({
+                              ...profile,
+                              firstName: e.target.value,
+                            })
+                          }
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>
@@ -225,6 +273,13 @@ const SettingsPage = () => {
                         </label>
                         <input
                           type="text"
+                          value={profile.middleName}
+                          onChange={(e) =>
+                            setProfile({
+                              ...profile,
+                              middleName: e.target.value,
+                            })
+                          }
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>
@@ -234,6 +289,10 @@ const SettingsPage = () => {
                         </label>
                         <input
                           type="text"
+                          value={profile.lastName}
+                          onChange={(e) =>
+                            setProfile({ ...profile, lastName: e.target.value })
+                          }
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>
@@ -243,14 +302,33 @@ const SettingsPage = () => {
                         </label>
                         <input
                           type="text"
+                          value={profile.phoneNumber}
+                          onChange={(e) =>
+                            setProfile({
+                              ...profile,
+                              phoneNumber: e.target.value,
+                            })
+                          }
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>
                       <button
                         type="submit"
-                        className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
+                        disabled={isSubmitting} // Disable button when submitting
+                        className="relative bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
                       >
-                        Update Profile
+                        <span
+                          className={`${
+                            isSubmitting ? "opacity-0" : "opacity-100"
+                          } transition-opacity duration-300`}
+                        >
+                          Update Profile
+                        </span>
+                        {isSubmitting && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <PulseLoader color="#ffffff" size={10} margin={4} />
+                          </div>
+                        )}
                       </button>
                     </form>
                   </Tab.Panel>
@@ -304,7 +382,7 @@ const SettingsPage = () => {
                       </div>
                       <button
                         type="submit"
-                        disabled={isSubmitting} // Disable button when submitting
+                        disabled={isSubmitting}
                         className="relative bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
                       >
                         <span
