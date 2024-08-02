@@ -12,24 +12,22 @@ import {
 import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
+import { userApi } from "../api";
+import { UserCompany } from "../types/User";
+import InviteUser, {
+  InviteUserFormInputs,
+} from "../components/forms/InviteUser";
 
 const UserManagementPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<UserCompany[]>([]);
+  const [showInviteUserModal, setShowInviteUserModal] = useState(false);
+
   const navigate = useNavigate();
-
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  interface User {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-  }
-
-  const [users, setUsers] = useState<User[]>([]);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
@@ -43,7 +41,7 @@ const UserManagementPage = () => {
     };
 
     checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
+    const interval = setInterval(checkSession, 60000);
 
     return () => clearInterval(interval);
   }, [navigate]);
@@ -53,19 +51,9 @@ const UserManagementPage = () => {
       setLoading(true);
       setError(null);
       try {
-        // Simulate data fetching
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        setUsers([
-          { id: 1, name: "John Doe", email: "john@example.com", role: "Admin" },
-          {
-            id: 2,
-            name: "Jane Smith",
-            email: "jane@example.com",
-            role: "User",
-          },
-          // Add more users as needed
-        ]);
-      } catch (err: any) {
+        const response = await userApi.getCompanyUsers();
+        setUsers(response.data);
+      } catch (err) {
         setError("Failed to load users. Please try again.");
       } finally {
         setLoading(false);
@@ -91,30 +79,38 @@ const UserManagementPage = () => {
     };
   }, []);
 
-  const handleInviteUser = (e: any) => {
-    e.preventDefault();
-    // Implement invite user logic here
-    alert("Invite user functionality to be implemented.");
+  const handleInviteUser = async (newUserInput: InviteUserFormInputs) => {
+    try {
+      // Create a new user object
+      const newUser = {
+        email: newUserInput.email,
+        firstName: newUserInput.firstName,
+        lastName: newUserInput.lastName,
+        role: newUserInput.role,
+        id: "",
+      };
+
+      // Call the API to invite the user
+      await userApi.inviteUser(newUserInput);
+
+      // Update the state with the new user
+      setUsers((prevUsers: any) => [...prevUsers, newUser]);
+
+      // Close the invite user modal
+      setShowInviteUserModal(false);
+    } catch (error) {
+      setError("Failed to invite user. Please try again.");
+    }
   };
 
-  const handleEditUser = (userId: any) => {
+  const handleEditUser = (userId: string) => {
     // Implement edit user logic here
     alert(`Edit user functionality for user ID ${userId} to be implemented.`);
   };
 
-  const handleDeleteUser = (userId: any) => {
+  const handleDeleteUser = (userId: string) => {
     // Implement delete user logic here
     alert(`Delete user functionality for user ID ${userId} to be implemented.`);
-  };
-
-  const handleAssignRole = (userId: any, newRole: any) => {
-    // Implement assign role logic here
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === userId ? { ...user, role: newRole } : user
-      )
-    );
-    alert(`Role assigned successfully to user ID ${userId}.`);
   };
 
   return (
@@ -177,6 +173,42 @@ const UserManagementPage = () => {
         </header>
 
         <main className="mt-6 p-6">
+          <button
+            onClick={() => setShowInviteUserModal(true)}
+            className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
+          >
+            Invite User
+          </button>
+
+          {showInviteUserModal && (
+            <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg relative">
+                <button
+                  title="Close"
+                  onClick={() => setShowInviteUserModal(false)}
+                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 8.586L3.707 2.293A1 1 0 002.293 3.707L8.586 10l-6.293 6.293a1 1 0 101.414 1.414L10 11.414l6.293 6.293a1 1 0 001.414-1.414L11.414 10l6.293-6.293a1 1 0 00-1.414-1.414L10 8.586z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+                <InviteUser
+                  onClose={() => setShowInviteUserModal(false)}
+                  onCreate={handleInviteUser}
+                />
+              </div>
+            </div>
+          )}
+
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <RingLoader color="#FE633D" size={60} />
@@ -187,81 +219,37 @@ const UserManagementPage = () => {
             <>
               <section className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow mb-6">
                 <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                  <FiUser className="mr-2" /> Invite User
-                </h2>
-                <form onSubmit={handleInviteUser} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
-                  >
-                    Invite User
-                  </button>
-                </form>
-              </section>
-
-              <section className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
                   <FiUser className="mr-2" /> Manage Users
                 </h2>
-                <table className="min-w-full bg-white">
+                <table className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                   <thead>
-                    <tr>
-                      <th className="py-2 px-4 border-b">Name</th>
-                      <th className="py-2 px-4 border-b">Email</th>
-                      <th className="py-2 px-4 border-b">Role</th>
-                      <th className="py-2 px-4 border-b">Actions</th>
+                    <tr className="bg-[#202046] text-white">
+                      <th className="py-2 px-4 text-left">Name</th>
+                      <th className="py-2 px-4 text-left">Email</th>
+                      <th className="py-2 px-4 text-left">Role</th>
+                      <th className="py-2 px-4 text-left">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((user) => (
-                      <tr
-                        key={user.id}
-                        className="hover:bg-gray-100 transition-colors"
-                      >
-                        <td className="py-2 px-4 border-b">{user.name}</td>
-                        <td className="py-2 px-4 border-b">{user.email}</td>
-                        <td className="py-2 px-4 border-b">
-                          <select
-                            value={user.role}
-                            onChange={(e) =>
-                              handleAssignRole(user.id, e.target.value)
-                            }
-                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
-                          >
-                            <option value="Admin">Admin</option>
-                            <option value="User">User</option>
-                            <option value="Viewer">Viewer</option>
-                          </select>
-                        </td>
-                        <td className="py-2 px-4 border-b flex space-x-2">
+                      <tr key={user.user.id} className="border-t">
+                        <td className="py-2 px-4">{`${user.user.firstName} ${user.user.lastName}`}</td>
+                        <td className="py-2 px-4">{user.user.email}</td>
+                        <td className="py-2 px-4">{user.role}</td>
+                        <td className="py-2 px-4">
                           <button
-                            type="button"
-                            onClick={() => handleEditUser(user.id)}
-                            className="text-blue-600 hover:text-blue-800"
-                            aria-label="Edit"
-                            title="Edit"
+                            onClick={() => handleEditUser(user.user.id)}
+                            className="text-blue-600 hover:underline"
                           >
-                            <FiEdit className="h-5 w-5" />
+                            <FiEdit />
                           </button>
                           <button
-                            type="button"
-                            onClick={() => handleDeleteUser(user.id)}
-                            className="text-red-600 hover:text-red-800"
-                            aria-label="Delete"
-                            title="Delete"
+                            onClick={() => handleDeleteUser(user.user.id)}
+                            className="text-red-600 hover:underline ml-4"
                           >
-                            <FiTrash2 className="h-5 w-5" />
+                            <FiTrash2 />
                           </button>
+                          {/* Add role assignment here if needed */}
                         </td>
                       </tr>
                     ))}

@@ -212,7 +212,7 @@ const SettingsPage = () => {
                     <form className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
-                          Full Name
+                          First Name
                         </label>
                         <input
                           type="text"
@@ -221,10 +221,28 @@ const SettingsPage = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
-                          Email Address
+                          Middle Name
                         </label>
                         <input
-                          type="email"
+                          type="text"
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Last Name
+                        </label>
+                        <input
+                          type="text"
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Phone Number
+                        </label>
+                        <input
+                          type="text"
                           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
                         />
                       </div>

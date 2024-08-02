@@ -43,7 +43,7 @@ const Login = () => {
       setToastMessage(response.message);
 
       // Store user information, token, and expiration time in local storage
-      const expirationTime = new Date().getTime() + 3600 * 1000; // 1 hour
+      const expirationTime = new Date().getTime() + 3600 * 1000 * 48; // 48 hours
       localStorage.setItem("user", JSON.stringify(response.user));
       localStorage.setItem("token", response.token);
       localStorage.setItem("expirationTime", expirationTime.toString());
