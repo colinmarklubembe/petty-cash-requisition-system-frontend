@@ -9,7 +9,9 @@ import { FiMenu, FiX, FiBell, FiSettings, FiUser } from "react-icons/fi";
 import Sidebar from "../components/ui/SideBar";
 import { requisitionApi, approvalApi } from "../api";
 import { Requisition } from "../types/Requisition";
-import { RingLoader } from "react-spinners"; // Importing a spinner component for loading
+import { RingLoader } from "react-spinners";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ApprovalsPage: React.FC = () => {
   const [approvals, setApprovals] = useState<Requisition[]>([]);
@@ -32,12 +34,11 @@ const ApprovalsPage: React.FC = () => {
     try {
       const response = await approvalApi.approveRequisition(id);
       console.log("Requisition approved: ", response);
-      setApprovals((prevApprovals) =>
-        prevApprovals.filter((approval) => approval.id !== id)
-      );
+      await fetchApprovals();
+      toast.success("Requisition approved successfully!");
     } catch (error: any) {
       console.error("Failed to approve requisition: ", error);
-      setError("Failed to approve requisition. Please try again.");
+      toast.error("Failed to approve requisition. Please try again.");
     }
   };
 
@@ -45,12 +46,11 @@ const ApprovalsPage: React.FC = () => {
     try {
       const response = await approvalApi.rejectRequisition(id);
       console.log("Requisition rejected: ", response);
-      setApprovals((prevApprovals) =>
-        prevApprovals.filter((approval) => approval.id !== id)
-      );
+      await fetchApprovals();
+      toast.success("Requisition rejected successfully!");
     } catch (error: any) {
       console.error("Failed to reject requisition: ", error);
-      setError("Failed to reject requisition. Please try again.");
+      toast.error("Failed to reject requisition. Please try again.");
     }
   };
 
@@ -58,17 +58,15 @@ const ApprovalsPage: React.FC = () => {
     try {
       const response = await approvalApi.stallRequisition(id);
       console.log("Requisition stalled: ", response);
-      setApprovals((prevApprovals) =>
-        prevApprovals.filter((approval) => approval.id !== id)
-      );
+      await fetchApprovals();
+      toast.success("Requisition stalled successfully!");
     } catch (error: any) {
       console.error("Failed to stall requisition: ", error);
-      setError("Failed to stall requisition. Please try again.");
+      toast.error("Failed to stall requisition. Please try again.");
     }
   };
 
   const fetchApprovals = useCallback(async () => {
-    setLoading(true);
     setError(null);
     try {
       const response = await requisitionApi.getAllRequisitions();
@@ -82,6 +80,7 @@ const ApprovalsPage: React.FC = () => {
         "Failed to fetch approvals. Please try again.";
       setError(errorMessage);
       console.error("Error: ", errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -212,9 +211,11 @@ const ApprovalsPage: React.FC = () => {
                             className={`py-1 px-3 rounded-full text-xs ${
                               approval.requisitionStatus === "DRAFTS"
                                 ? "bg-gray-200 text-gray-600"
-                                : approval.requisitionStatus === "PENDING"
-                                ? "bg-yellow-200 text-yellow-600"
-                                : "bg-gray-100 text-gray-600"
+                                : approval.requisitionStatus === "APPROVED"
+                                ? "bg-green-200 text-green-600"
+                                : approval.requisitionStatus === "REJECTED"
+                                ? "bg-red-200 text-red-600"
+                                : "bg-yellow-200 text-yellow-600"
                             }`}
                           >
                             {approval.requisitionStatus}
@@ -263,6 +264,7 @@ const ApprovalsPage: React.FC = () => {
           )}
         </main>
       </div>
+      <ToastContainer />
     </div>
   );
 };

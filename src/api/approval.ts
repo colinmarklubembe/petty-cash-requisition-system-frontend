@@ -44,8 +44,9 @@ class ApprovalApi {
   async stallRequisition(requisitionId: string) {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
-    const response = await axios.get(
+    const response = await axios.put(
       `${API_URL}/approvals/stall/${requisitionId}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${token}`,
