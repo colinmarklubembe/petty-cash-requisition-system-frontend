@@ -1,4 +1,3 @@
-// pages/PettyFundsPage.tsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -57,14 +56,18 @@ const PettyFundsPage: React.FC = () => {
 
   const handleEditFund = (id: string) => {
     // Logic to edit the petty fund with the given id
+    setDropdownOpen(false); // Close the dropdown after edit
   };
 
   const handleDeleteFund = (id: string) => {
     // Logic to delete the petty fund with the given id
+    setDropdownOpen(false); // Close the dropdown after delete
   };
 
-  const handleViewFund = async (id: string) => {
-    console.log();
+  const handleViewFund = (id: string) => {
+    const fund = funds.find((fund) => fund.id === id);
+    setSelectedFund(fund || null);
+    setDropdownOpen(false); // Close the dropdown after view
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -228,10 +231,10 @@ const PettyFundsPage: React.FC = () => {
                       Current Balance(Ugx)
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Total Spent(Ugx)
+                      Total Added
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Total Added(Ugx)
+                      Total Spent
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
                       Actions
@@ -239,98 +242,100 @@ const PettyFundsPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {funds.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-3 px-6 text-gray-600">
-                        No petty funds found. Create a new petty fund to get
-                        started.
+                  {funds.map((fund) => (
+                    <tr key={fund.id} className="hover:bg-gray-100">
+                      <td className="py-4 px-6 border-b">{fund.name}</td>
+                      <td className="py-4 px-6 border-b">
+                        {renderCell(fund.currentBalance)}
                       </td>
-                    </tr>
-                  ) : (
-                    funds.map((fund) => (
-                      <tr key={fund.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3 px-6">{renderCell(fund.name)}</td>
-                        <td className="py-3 px-6">
-                          {renderCell(fund.currentBalance)}
-                        </td>
-                        <td className="py-3 px-6">
-                          {renderCell(fund.totalSpent)}
-                        </td>
-                        <td className="py-3 px-6">
-                          {renderCell(fund.totalAdded)}
-                        </td>
-                        <td
-                          className="py-3 px-6 relative"
-                          ref={
-                            actionsRef as React.RefObject<HTMLTableDataCellElement>
-                          }
-                        >
+                      <td className="py-4 px-6 border-b">
+                        {renderCell(fund.totalAdded)}
+                      </td>
+                      <td className="py-4 px-6 border-b">
+                        {renderCell(fund.totalSpent)}
+                      </td>
+                      <td className="py-4 px-6 border-b">
+                        <div className="relative inline-block text-left">
                           <button
                             onClick={() =>
                               setActiveFundId(
                                 activeFundId === fund.id ? null : fund.id
                               )
                             }
-                            className="focus:outline-none"
+                            className="text-gray-600 hover:text-gray-900 focus:outline-none"
                           >
                             <FontAwesomeIcon icon={faEllipsisH} />
                           </button>
                           {activeFundId === fund.id && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                              <button
-                                onClick={() => handleViewFund(fund.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                            <div
+                              className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+                              ref={actionsRef}
+                            >
+                              <div
+                                className="py-1"
+                                role="menu"
+                                aria-orientation="vertical"
+                                aria-labelledby="options-menu"
                               >
-                                <FontAwesomeIcon
-                                  icon={faEye}
-                                  className="mr-2"
-                                />
-                                View
-                              </button>
-                              <button
-                                onClick={() => handleEditFund(fund.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                              >
-                                <FontAwesomeIcon
-                                  icon={faEdit}
-                                  className="mr-2"
-                                />
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => handleDeleteFund(fund.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                              >
-                                <FontAwesomeIcon
-                                  icon={faTrashAlt}
-                                  className="mr-2"
-                                />
-                                Delete
-                              </button>
+                                <button
+                                  onClick={() => {
+                                    handleEditFund(fund.id);
+                                    setActiveFundId(null); // Ensure the fund dropdown closes
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+                                  role="menuitem"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faEdit}
+                                    className="mr-2"
+                                  />
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    handleDeleteFund(fund.id);
+                                    setActiveFundId(null); // Ensure the fund dropdown closes
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+                                  role="menuitem"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faTrashAlt}
+                                    className="mr-2"
+                                  />
+                                  Delete
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    handleViewFund(fund.id);
+                                    setActiveFundId(null); // Ensure the fund dropdown closes
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+                                  role="menuitem"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faEye}
+                                    className="mr-2"
+                                  />
+                                  View
+                                </button>
+                              </div>
                             </div>
                           )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
+              {selectedFund && (
+                <Modal isVisible={true} onClose={() => setSelectedFund(null)}>
+                  <PettyFundDetailView fund={selectedFund} />
+                </Modal>
+              )}
             </div>
           )}
         </main>
-
-        {/* Modal for detailed view */}
-        {selectedFund && (
-          <Modal
-            isVisible={!!selectedFund}
-            onClose={() => setSelectedFund(null)}
-          >
-            <PettyFundDetailView
-              fund={selectedFund}
-              onClose={() => setSelectedFund(null)}
-            />
-          </Modal>
-        )}
       </div>
     </div>
   );

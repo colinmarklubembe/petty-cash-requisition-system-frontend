@@ -8,8 +8,10 @@ import {
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "../components/ui/SideBar";
-import { FiBell, FiSettings, FiUser, FiMenu, FiX } from "react-icons/fi";
+import { FiBell, FiMenu, FiSettings, FiUser, FiX } from "react-icons/fi";
 import CreateRequisition from "../components/forms/CreateRequisition";
+import RequisitionDetailsView from "../components/views/Requisition";
+import Modal from "../components/ui/Modal";
 import { Requisition, RequisitionFormInputs } from "../types/Requisition";
 import { requisitionApi } from "../api";
 import { RingLoader } from "react-spinners";
@@ -26,23 +28,20 @@ const RequisitionsPage: React.FC = () => {
   );
   const [showCreateRequisitionModal, setShowCreateRequisitionModal] =
     useState(false);
+  const [selectedRequisition, setSelectedRequisition] =
+    useState<Requisition | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const toggleDropdown = () => {
-    setDropdownOpen(!isDropdownOpen);
-  };
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   const handleCreateRequisition = (newRequisition: RequisitionFormInputs) => {
     const requisition: Requisition = {
-      id: "",
+      id: "", // You might need to replace this with an actual ID if generating it elsewhere
       title: newRequisition.title,
       description: newRequisition.description,
       amount: newRequisition.amount,
@@ -51,20 +50,27 @@ const RequisitionsPage: React.FC = () => {
       pettyCashFund: null,
     };
 
-    setRequisitions((prevRequisitions) => [...prevRequisitions, requisition]);
+    setRequisitions((prev) => [...prev, requisition]);
     setShowCreateRequisitionModal(false);
   };
 
   const handleEditRequisition = (id: string) => {
     // Logic to edit the requisition with the given id
+    setDropdownOpen(false); // Ensure the dropdown closes
+    setActiveRequisitionId(null); // Clear active ID
   };
 
   const handleDeleteRequisition = (id: string) => {
     // Logic to delete the requisition with the given id
+    setDropdownOpen(false); // Ensure the dropdown closes
+    setActiveRequisitionId(null); // Clear active ID
   };
 
   const handleViewRequisition = (id: string) => {
-    // Logic to view the requisition with the given id
+    const requisition = requisitions.find((req) => req.id === id) || null;
+    setSelectedRequisition(requisition);
+    setDropdownOpen(false); // Ensure the dropdown closes
+    setActiveRequisitionId(null); // Clear active ID
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -121,20 +127,8 @@ const RequisitionsPage: React.FC = () => {
     };
   }, []);
 
-  // // Function to handle conditional rendering
-  // const renderCell = (value: string | number | undefined | null) => {
-  //   if (typeof value === "string") {
-  //     return value.trim() === "" ? "N/A" : value;
-  //   }
-
-  //   if (typeof value === "undefined") {
-  //     return "N/A";
-  //   }
-  //   return value === undefined || value === null ? 0 : value;
-  // };
-
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div
         className={`flex-1 transition-all duration-300 ${
@@ -191,8 +185,7 @@ const RequisitionsPage: React.FC = () => {
             </div>
           </div>
         </header>
-
-        <main className="p-6 flex flex-col h-full">
+        <main className="mt-6 p-6 flex flex-col h-full">
           <button
             onClick={() => setShowCreateRequisitionModal(true)}
             className="bg-orange-500 text-white py-2 px-4 rounded-full hover:bg-orange-700 transition-colors flex items-center mb-6 self-end"
@@ -201,32 +194,15 @@ const RequisitionsPage: React.FC = () => {
             Create Requisition
           </button>
           {showCreateRequisitionModal && (
-            <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg relative">
-                <button
-                  title="Close"
-                  onClick={() => setShowCreateRequisitionModal(false)}
-                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 8.586L3.707 2.293A1 1 0 002.293 3.707L8.586 10l-6.293 6.293a1 1 0 101.414 1.414L10 11.414l6.293 6.293a1 1 0 001.414-1.414L11.414 10l6.293-6.293a1 1 0 00-1.414-1.414L10 8.586z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-                <CreateRequisition
-                  onClose={() => setShowCreateRequisitionModal(false)}
-                  onCreate={handleCreateRequisition}
-                />
-              </div>
-            </div>
+            <Modal
+              isVisible={showCreateRequisitionModal}
+              onClose={() => setShowCreateRequisitionModal(false)}
+            >
+              <CreateRequisition
+                onClose={() => setShowCreateRequisitionModal(false)}
+                onCreate={handleCreateRequisition}
+              />
+            </Modal>
           )}
           {loading ? (
             <div className="flex items-center justify-center flex-grow">
@@ -240,7 +216,7 @@ const RequisitionsPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Description
+                      Title
                     </th>
                     <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
                       Amount
@@ -257,39 +233,27 @@ const RequisitionsPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {requisitions.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-3 px-6 text-gray-600">
-                        No requisitions found. Create a new requisition to get
-                        started.
+                  {requisitions.map((req) => (
+                    <tr
+                      key={req.id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                    >
+                      <td className="py-3 px-6 border-b text-sm">
+                        {req.title}
                       </td>
-                    </tr>
-                  ) : (
-                    requisitions.map((req) => (
-                      <tr key={req.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3 px-6">{req.description}</td>
-                        <td className="py-3 px-6">{req.amount}</td>
-                        <td className="py-3 px-6">
-                          <span
-                            className={`py-1 px-3 rounded-full text-xs ${
-                              req.requisitionStatus === "APPROVED"
-                                ? "bg-green-200 text-green-800"
-                                : req.requisitionStatus === "PENDING"
-                                ? "bg-yellow-200 text-yellow-800"
-                                : req.requisitionStatus === "DRAFTS"
-                                ? "bg-gray-200 text-gray-800"
-                                : "bg-red-200 text-red-600"
-                            }`}
-                          >
-                            {req.requisitionStatus}
-                          </span>
-                        </td>
-                        <td className="py-3 px-6">{req.pettyCashFund?.name}</td>
-                        <td
-                          className="py-3 px-6 relative"
-                          ref={
-                            actionsRef as React.RefObject<HTMLTableDataCellElement>
-                          }
+                      <td className="py-3 px-6 border-b text-sm">
+                        {req.amount}
+                      </td>
+                      <td className="py-3 px-6 border-b text-sm">
+                        {req.requisitionStatus}
+                      </td>
+                      <td className="py-3 px-6 border-b text-sm">
+                        {req.pettyCashFund?.name || "N/A"}
+                      </td>
+                      <td className="py-3 px-6 border-b text-sm">
+                        <div
+                          className="relative inline-block text-left"
+                          ref={actionsRef}
                         >
                           <button
                             onClick={() =>
@@ -297,15 +261,18 @@ const RequisitionsPage: React.FC = () => {
                                 activeRequisitionId === req.id ? null : req.id
                               )
                             }
-                            className="focus:outline-none"
+                            className="text-gray-600 hover:text-gray-900 focus:outline-none"
                           >
                             <FontAwesomeIcon icon={faEllipsisH} />
                           </button>
                           {activeRequisitionId === req.id && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                            <div
+                              className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-48"
+                              ref={actionsRef}
+                            >
                               <button
                                 onClick={() => handleViewRequisition(req.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
                               >
                                 <FontAwesomeIcon
                                   icon={faEye}
@@ -315,7 +282,7 @@ const RequisitionsPage: React.FC = () => {
                               </button>
                               <button
                                 onClick={() => handleEditRequisition(req.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
                               >
                                 <FontAwesomeIcon
                                   icon={faEdit}
@@ -325,7 +292,7 @@ const RequisitionsPage: React.FC = () => {
                               </button>
                               <button
                                 onClick={() => handleDeleteRequisition(req.id)}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 text-red-500"
                               >
                                 <FontAwesomeIcon
                                   icon={faTrashAlt}
@@ -335,13 +302,21 @@ const RequisitionsPage: React.FC = () => {
                               </button>
                             </div>
                           )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
+          )}
+          {selectedRequisition && (
+            <Modal
+              isVisible={!!selectedRequisition}
+              onClose={() => setSelectedRequisition(null)}
+            >
+              <RequisitionDetailsView requisition={selectedRequisition} />
+            </Modal>
           )}
         </main>
       </div>

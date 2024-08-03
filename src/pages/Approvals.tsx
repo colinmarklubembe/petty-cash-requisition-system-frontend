@@ -55,7 +55,16 @@ const ApprovalsPage: React.FC = () => {
   };
 
   const handleStall = async (id: string) => {
-    // Implement stall logic
+    try {
+      const response = await approvalApi.stallRequisition(id);
+      console.log("Requisition stalled: ", response);
+      setApprovals((prevApprovals) =>
+        prevApprovals.filter((approval) => approval.id !== id)
+      );
+    } catch (error: any) {
+      console.error("Failed to stall requisition: ", error);
+      setError("Failed to stall requisition. Please try again.");
+    }
   };
 
   const fetchApprovals = useCallback(async () => {
