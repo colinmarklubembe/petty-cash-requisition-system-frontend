@@ -15,6 +15,8 @@ import CreateTransaction from "../components/forms/CreateTransaction";
 import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
+import TransactionDetailsView from "../components/views/Transaction";
+import Modal from "../components/ui/Modal";
 
 const TransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -25,6 +27,8 @@ const TransactionsPage: React.FC = () => {
   );
   const [showCreateTransactionModal, setShowCreateTransactionModal] =
     useState(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -74,14 +78,18 @@ const TransactionsPage: React.FC = () => {
 
   const handleEditTransaction = (id: string) => {
     // Logic to edit the transaction with the given id
+    setDropdownOpen(false);
   };
 
   const handleDeleteTransaction = (id: string) => {
     // Logic to delete the transaction with the given id
+    setDropdownOpen(false);
   };
 
   const handleViewTransaction = (id: string) => {
-    // Logic to view the transaction with the given id
+    const transaction = transactions.find((t) => t.id === id);
+    setSelectedTransaction(transaction || null);
+    setDropdownOpen(false);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -283,11 +291,15 @@ const TransactionsPage: React.FC = () => {
                             <FontAwesomeIcon icon={faEllipsisH} />
                           </button>
                           {activeTransactionId === transaction.id && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                            <div
+                              className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10"
+                              ref={actionsRef}
+                            >
                               <button
-                                onClick={() =>
-                                  handleViewTransaction(transaction.id)
-                                }
+                                onClick={() => {
+                                  handleViewTransaction(transaction.id);
+                                  setActiveTransactionId(null);
+                                }}
                                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
                               >
                                 <FontAwesomeIcon
@@ -297,9 +309,10 @@ const TransactionsPage: React.FC = () => {
                                 View
                               </button>
                               <button
-                                onClick={() =>
-                                  handleEditTransaction(transaction.id)
-                                }
+                                onClick={() => {
+                                  handleEditTransaction(transaction.id);
+                                  setActiveTransactionId(null);
+                                }}
                                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
                               >
                                 <FontAwesomeIcon
@@ -309,9 +322,10 @@ const TransactionsPage: React.FC = () => {
                                 Edit
                               </button>
                               <button
-                                onClick={() =>
-                                  handleDeleteTransaction(transaction.id)
-                                }
+                                onClick={() => {
+                                  handleDeleteTransaction(transaction.id);
+                                  setActiveTransactionId(null);
+                                }}
                                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
                               >
                                 <FontAwesomeIcon
@@ -331,6 +345,15 @@ const TransactionsPage: React.FC = () => {
             </div>
           )}
         </main>
+        {/* Transaction Details View */}
+        {selectedTransaction && (
+          <Modal
+            isVisible={!!selectedTransaction}
+            onClose={() => setSelectedTransaction(null)}
+          >
+            <TransactionDetailsView transaction={selectedTransaction} />
+          </Modal>
+        )}
       </div>
     </div>
   );

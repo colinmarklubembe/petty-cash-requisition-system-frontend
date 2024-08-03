@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 interface ModalProps {
   isVisible: boolean;
@@ -7,11 +7,35 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isVisible, onClose, children }) => {
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    };
+
+    if (isVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isVisible, onClose]);
+
   if (!isVisible) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 relative">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl h-auto max-h-[80vh] relative overflow-auto"
+      >
         <button
           title="Close"
           onClick={onClose}
