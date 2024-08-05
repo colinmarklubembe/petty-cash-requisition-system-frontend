@@ -22,6 +22,21 @@ class CompanyApi {
     });
     return response.data;
   };
+
+  editCompany = async (companyId: string, data: any) => {
+    const token = localStorage.getItem("token");
+    const response = await axios.put(
+      `${API_URL}/update-company/${companyId}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  };
 }
 
 const companyApi = new CompanyApi();

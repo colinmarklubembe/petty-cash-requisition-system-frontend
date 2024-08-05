@@ -55,19 +55,17 @@ const PettyFundsPage: React.FC = () => {
   };
 
   const handleEditFund = (id: string) => {
-    // Logic to edit the petty fund with the given id
-    setDropdownOpen(false); // Close the dropdown after edit
+    setDropdownOpen(false);
   };
 
   const handleDeleteFund = (id: string) => {
-    // Logic to delete the petty fund with the given id
-    setDropdownOpen(false); // Close the dropdown after delete
+    setDropdownOpen(false);
   };
 
   const handleViewFund = (id: string) => {
     const fund = funds.find((fund) => fund.id === id);
     setSelectedFund(fund || null);
-    setDropdownOpen(false); // Close the dropdown after view
+    setDropdownOpen(false);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -94,7 +92,7 @@ const PettyFundsPage: React.FC = () => {
     };
 
     checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
+    const interval = setInterval(checkSession, 60000);
 
     return () => clearInterval(interval);
   }, [navigate]);
@@ -144,7 +142,7 @@ const PettyFundsPage: React.FC = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
           <h1 className="text-3xl font-bold text-white">Petty Funds</h1>
           <div className="relative" ref={dropdownRef}>
             <button
@@ -280,7 +278,7 @@ const PettyFundsPage: React.FC = () => {
                                 <button
                                   onClick={() => {
                                     handleEditFund(fund.id);
-                                    setActiveFundId(null); // Ensure the fund dropdown closes
+                                    setActiveFundId(null);
                                   }}
                                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
                                   role="menuitem"
@@ -294,7 +292,7 @@ const PettyFundsPage: React.FC = () => {
                                 <button
                                   onClick={() => {
                                     handleDeleteFund(fund.id);
-                                    setActiveFundId(null); // Ensure the fund dropdown closes
+                                    setActiveFundId(null);
                                   }}
                                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
                                   role="menuitem"
@@ -308,7 +306,7 @@ const PettyFundsPage: React.FC = () => {
                                 <button
                                   onClick={() => {
                                     handleViewFund(fund.id);
-                                    setActiveFundId(null); // Ensure the fund dropdown closes
+                                    setActiveFundId(null);
                                   }}
                                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
                                   role="menuitem"

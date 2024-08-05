@@ -42,13 +42,11 @@ const Login = () => {
       const response = await authApi.login(data);
       setToastMessage(response.message);
 
-      // Store user information, token, and expiration time in local storage
-      const expirationTime = new Date().getTime() + 3600 * 1000 * 48; // 48 hours
+      const expirationTime = new Date().getTime() + 3600 * 1000 * 48;
       localStorage.setItem("user", JSON.stringify(response.user));
       localStorage.setItem("token", response.token);
       localStorage.setItem("expirationTime", expirationTime.toString());
 
-      // Redirect to Companies page
       navigate("/companies");
       console.log("Login successful", response);
     } catch (error: any) {

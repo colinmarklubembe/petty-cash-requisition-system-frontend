@@ -123,7 +123,7 @@ const UserManagementPage = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
           <h1 className="text-3xl font-bold text-white">User Management</h1>
           <div className="relative" ref={dropdownRef}>
             <button

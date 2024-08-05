@@ -39,9 +39,23 @@ const RequisitionsPage: React.FC = () => {
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000);
+
+    return () => clearInterval(interval);
+  }, [navigate]);
+
   const handleCreateRequisition = (newRequisition: RequisitionFormInputs) => {
     const requisition: Requisition = {
-      id: "", // You might need to replace this with an actual ID if generating it elsewhere
+      id: "",
       title: newRequisition.title,
       description: newRequisition.description,
       amount: newRequisition.amount,
@@ -55,22 +69,20 @@ const RequisitionsPage: React.FC = () => {
   };
 
   const handleEditRequisition = (id: string) => {
-    // Logic to edit the requisition with the given id
-    setDropdownOpen(false); // Ensure the dropdown closes
-    setActiveRequisitionId(null); // Clear active ID
+    setDropdownOpen(false);
+    setActiveRequisitionId(null);
   };
 
   const handleDeleteRequisition = (id: string) => {
-    // Logic to delete the requisition with the given id
-    setDropdownOpen(false); // Ensure the dropdown closes
-    setActiveRequisitionId(null); // Clear active ID
+    setDropdownOpen(false);
+    setActiveRequisitionId(null);
   };
 
   const handleViewRequisition = (id: string) => {
     const requisition = requisitions.find((req) => req.id === id) || null;
     setSelectedRequisition(requisition);
-    setDropdownOpen(false); // Ensure the dropdown closes
-    setActiveRequisitionId(null); // Clear active ID
+    setDropdownOpen(false);
+    setActiveRequisitionId(null);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -103,20 +115,6 @@ const RequisitionsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
-
-    return () => clearInterval(interval);
-  }, [navigate]);
-
-  useEffect(() => {
     fetchRequisitions();
   }, [fetchRequisitions]);
 
@@ -135,7 +133,7 @@ const RequisitionsPage: React.FC = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
           <h1 className="text-3xl font-bold text-white">Requisitions</h1>
           <div className="relative" ref={dropdownRef}>
             <button
@@ -245,7 +243,25 @@ const RequisitionsPage: React.FC = () => {
                         {req.amount}
                       </td>
                       <td className="py-3 px-6 border-b text-sm">
-                        {req.requisitionStatus}
+                        <span
+                          className={`py-1 px-3 rounded-full text-xs font-semibold ${
+                            req.requisitionStatus === "APPROVED"
+                              ? "bg-green-100 text-green-800"
+                              : req.requisitionStatus === "REJECTED"
+                              ? "bg-red-100 text-red-800"
+                              : req.requisitionStatus === "DRAFTS"
+                              ? "bg-gray-100 text-gray-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {req.requisitionStatus === "APPROVED"
+                            ? "Approved"
+                            : req.requisitionStatus === "REJECTED"
+                            ? "Rejected"
+                            : req.requisitionStatus === "DRAFTS"
+                            ? "Drafts"
+                            : "Pending"}
+                        </span>
                       </td>
                       <td className="py-3 px-6 border-b text-sm">
                         {req.pettyCashFund?.name || "N/A"}

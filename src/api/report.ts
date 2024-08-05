@@ -3,59 +3,20 @@ import axios from "axios";
 const API_URL = `${process.env.REACT_APP_BASE_URL!}/reports`;
 
 class ReportApi {
-  async getAllReports() {
+  async getUserReport(userId: string, selectedDate?: string) {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
-    const response = await axios.get(`${API_URL}/all`, {
+
+    const url = new URL(`${API_URL}/user/${userId}`);
+
+    if (selectedDate) {
+      url.searchParams.append("selectedDate", selectedDate);
+    }
+
+    const response = await axios.get(url.toString(), {
       headers: {
         Authorization: `Bearer ${token}`,
         "company-id": `${companyId}`,
-      },
-    });
-
-    return response.data;
-  }
-
-  async getReportById(reportId: string) {
-    const token = localStorage.getItem("token");
-    const response = await axios.get(`${API_URL}/get-report/${reportId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    return response.data;
-  }
-
-  async createReport(reportData: any) {
-    const token = localStorage.getItem("token");
-    const companyId = localStorage.getItem("companyId");
-    const response = await axios.post(`${API_URL}/create-report`, reportData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
-
-    return response.data;
-  }
-
-  async updateReport(reportId: string, reportData: any) {
-    const token = localStorage.getItem("token");
-    const response = await axios.put(`${API_URL}/${reportId}`, reportData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    return response.data;
-  }
-
-  async deleteReport(reportId: string) {
-    const token = localStorage.getItem("token");
-    const response = await axios.delete(`${API_URL}/delete/${reportId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
       },
     });
 

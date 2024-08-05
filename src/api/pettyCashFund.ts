@@ -30,7 +30,11 @@ class PettyCashApi {
   };
 
   updatePettyCashFund = async (fundId: string, data: any) => {
-    const response = await axios.put(`${API_URL}/update/${fundId}`, data);
+    const response = await axios.put(`${API_URL}/update/${fundId}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
     return response.data;
   };

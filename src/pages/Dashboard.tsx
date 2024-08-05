@@ -39,7 +39,7 @@ const Dashboard = () => {
     };
 
     checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
+    const interval = setInterval(checkSession, 60000);
 
     return () => clearInterval(interval);
   }, [navigate]);
@@ -207,7 +207,7 @@ const Dashboard = () => {
       <div
         className={`flex-1 transition-all duration-300 ${
           isSidebarOpen ? "ml-56" : "ml-12"
-        }`} // Adjust margin based on sidebar width
+        }`}
       >
         <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
@@ -269,7 +269,6 @@ const Dashboard = () => {
             <p className="text-red-500">{error}</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Cards with equal size */}
               <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                 <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
                   <FiDollarSign className="mr-2 text-[#FE633D]" /> Fund Balance

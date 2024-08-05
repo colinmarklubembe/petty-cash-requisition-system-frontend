@@ -39,7 +39,7 @@ const CompaniesPage = () => {
     };
 
     checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
+    const interval = setInterval(checkSession, 60000);
 
     return () => clearInterval(interval);
   }, [navigate]);

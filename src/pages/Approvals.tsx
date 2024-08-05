@@ -12,6 +12,8 @@ import { Requisition } from "../types/Requisition";
 import { RingLoader } from "react-spinners";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import { isSessionExpired } from "../utils/session";
 
 const ApprovalsPage: React.FC = () => {
   const [approvals, setApprovals] = useState<Requisition[]>([]);
@@ -19,8 +21,23 @@ const ApprovalsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000);
+
+    return () => clearInterval(interval);
+  }, [navigate]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -114,7 +131,7 @@ const ApprovalsPage: React.FC = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
           <h1 className="text-3xl font-bold text-white">Approvals</h1>
           <div className="relative" ref={dropdownRef}>
             <button

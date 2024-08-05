@@ -1,48 +1,29 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEdit,
-  faTrashAlt,
-  faPlus,
-  faEllipsisH,
-  faEye,
-} from "@fortawesome/free-solid-svg-icons";
 import { FiMenu, FiX, FiBell, FiSettings, FiUser } from "react-icons/fi";
 import Sidebar from "../components/ui/SideBar";
-import { reportApi } from "../api";
-import { Report, ReportFormInputs } from "../types/Report";
-import CreateReport from "../components/forms/CreateReport";
+import { reportApi, userApi } from "../api";
+import { Report } from "../types/Report";
+import { UserCompany } from "../types/User";
 import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
+import UserReport from "../components/views/UserReport";
+import DownloadButton from "../components/ui/DownloadReport";
 
 const ReportsPage: React.FC = () => {
-  const [reports, setReports] = useState<Report[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [activeReportId, setActiveReportId] = useState<string | null>(null);
-  const [showCreateReportModal, setShowCreateReportModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState<boolean | string>(false); // track loading state for actions
   const [error, setError] = useState<string | null>(null);
+  const [reportType, setReportType] = useState<string | null>(null);
+  const [users, setUsers] = useState<UserCompany[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [report, setReport] = useState<Report | null>(null);
   const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
-
-  const fetchReports = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await reportApi.getAllReports();
-      setReports(response.data.reports);
-    } catch (error) {
-      setError("Failed to fetch reports. Please try again.");
-      console.error("Failed to fetch reports: ", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
     const checkSession = () => {
@@ -53,14 +34,52 @@ const ReportsPage: React.FC = () => {
     };
 
     checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
+    const interval = setInterval(checkSession, 60000);
 
     return () => clearInterval(interval);
   }, [navigate]);
 
+  const fetchReports = useCallback(async () => {
+    if (!reportType) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      let response;
+      const selectedDate = selectedMonth
+        ? `${new Date().getFullYear()}-${selectedMonth}-01`
+        : undefined;
+      if (reportType === "user" && selectedUserId) {
+        response = await reportApi.getUserReport(selectedUserId, selectedDate);
+        setReport(response.data);
+      } else if (reportType === "company") {
+        // response = await reportApi.getCompanyReport(selectedDate);
+        // setReport(response.data);
+      }
+    } catch (error) {
+      setError("Failed to fetch reports. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [reportType, selectedUserId, selectedMonth]);
+
   useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
+    if (reportType) {
+      if (reportType === "user" && !users.length) {
+        const fetchUsers = async () => {
+          try {
+            const response = await userApi.getCompanyUsers();
+            setUsers(response.data);
+          } catch (error) {
+            setError("Failed to fetch users. Please try again.");
+          }
+        };
+        fetchUsers();
+      } else {
+        fetchReports();
+      }
+    }
+  }, [fetchReports, reportType, users]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -68,66 +87,6 @@ const ReportsPage: React.FC = () => {
 
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
-  };
-
-  const handleCreateReport = async (newReport: ReportFormInputs) => {
-    setActionLoading("create"); // Set loading state for creating report
-    try {
-      const report: Report = {
-        id: "",
-        title: newReport.title,
-        content: newReport.content,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Simulate a delay or API call
-      setReports((prevReports) => [...prevReports, report]);
-      setShowCreateReportModal(false);
-    } catch (error) {
-      setError("Failed to create report. Please try again.");
-      console.error("Failed to create report: ", error);
-    } finally {
-      setActionLoading(false); // Reset action loading state
-    }
-  };
-
-  const handleEditReport = async (id: string) => {
-    setActionLoading(id); // Set loading state for editing report
-    try {
-      // Simulate an API call to edit the report
-    } catch (error) {
-      setError("Failed to edit report. Please try again.");
-      console.error("Failed to edit report: ", error);
-    } finally {
-      setActionLoading(false); // Reset action loading state
-    }
-  };
-
-  const handleDeleteReport = async (id: string) => {
-    setActionLoading(id); // Set loading state for deleting report
-    try {
-      // Simulate an API call to delete the report
-      setReports((prevReports) =>
-        prevReports.filter((report) => report.id !== id)
-      );
-    } catch (error) {
-      setError("Failed to delete report. Please try again.");
-      console.error("Failed to delete report: ", error);
-    } finally {
-      setActionLoading(false); // Reset action loading state
-    }
-  };
-
-  const handleViewReport = async (id: string) => {
-    setActionLoading(id); // Set loading state for viewing report
-    try {
-      // Simulate an API call to view the report
-    } catch (error) {
-      setError("Failed to view report. Please try again.");
-      console.error("Failed to view report: ", error);
-    } finally {
-      setActionLoading(false); // Reset action loading state
-    }
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -141,7 +100,7 @@ const ReportsPage: React.FC = () => {
       actionsRef.current &&
       !actionsRef.current.contains(event.target as Node)
     ) {
-      setActiveReportId(null);
+      // setActiveReportId(null);
     }
   };
 
@@ -152,16 +111,29 @@ const ReportsPage: React.FC = () => {
     };
   }, []);
 
+  const handleGenerateReport = (type: string) => {
+    setReportType(type);
+    setSelectedUserId(null);
+  };
+
+  const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedUserId(event.target.value);
+  };
+
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(event.target.value);
+  };
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div
         className={`flex-1 transition-all duration-300 ${
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
-          <h1 className="text-3xl font-bold text-white">Reports</h1>
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
+          <h1 className="text-4xl font-bold text-white">Reports</h1>
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
@@ -212,148 +184,109 @@ const ReportsPage: React.FC = () => {
         </header>
 
         <main className="p-6 flex flex-col h-full">
-          <button
-            onClick={() => setShowCreateReportModal(true)}
-            className="bg-orange-500 text-white py-2 px-4 rounded-full hover:bg-orange-700 transition-colors flex items-center mb-6 self-end"
-          >
-            <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            Create Report
-          </button>
-          {showCreateReportModal && (
-            <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg relative">
-                <button
-                  title="Close"
-                  onClick={() => setShowCreateReportModal(false)}
-                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 8.586L3.707 2.293A1 1 0 002.293 3.707L8.586 10l-6.293 6.293a1 1 0 101.414 1.414L10 11.414l6.293 6.293a1 1 0 001.414-1.414L11.414 10l6.293-6.293a1 1 0 00-1.414-1.414L10 8.586z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-                <CreateReport
-                  onClose={() => setShowCreateReportModal(false)}
-                  onCreate={handleCreateReport}
+          <div className="bg-white shadow-md rounded-lg p-6 mb-6 flex flex-col space-y-4">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => handleGenerateReport("user")}
+                className={`py-2 px-6 rounded-full transition-colors ${
+                  reportType === "user"
+                    ? "bg-[#FE633D] text-white"
+                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
+              >
+                Generate User Report
+              </button>
+              <button
+                onClick={() => handleGenerateReport("company")}
+                className={`py-2 px-6 rounded-full transition-colors ${
+                  reportType === "company"
+                    ? "bg-[#FE633D] text-white"
+                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
+              >
+                Generate Company Report
+              </button>
+              {report && (
+                <DownloadButton
+                  data={report}
+                  fileName={`report_${reportType}_${
+                    selectedMonth || "all"
+                  }.pdf`}
                 />
+              )}
+            </div>
+
+            <div className="flex items-center space-x-4">
+              {reportType === "user" && (
+                <div className="flex flex-col">
+                  <label htmlFor="userSelect" className="mb-1 text-gray-600">
+                    Select a user:
+                  </label>
+                  <select
+                    id="userSelect"
+                    value={selectedUserId || ""}
+                    onChange={handleUserChange}
+                    className="p-2 border rounded-lg bg-white text-gray-700 border-gray-300"
+                  >
+                    <option value="">Select a user</option>
+                    {users.map((user) => (
+                      <option key={user.user.id} value={user.user.id}>
+                        {user.user.firstName} ({user.role})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="flex flex-col">
+                <label htmlFor="monthSelect" className="mb-1 text-gray-600">
+                  Select a month(<strong>optional</strong>):
+                </label>
+                <select
+                  id="monthSelect"
+                  value={selectedMonth || ""}
+                  onChange={handleMonthChange}
+                  className="p-2 border rounded-lg bg-white text-gray-700 border-gray-300"
+                >
+                  <option value="">Select a month</option>
+                  {Array.from({ length: 12 }, (_, index) => {
+                    const month = (index + 1).toString().padStart(2, "0");
+                    return (
+                      <option key={month} value={month}>
+                        {new Date(0, index).toLocaleString("default", {
+                          month: "long",
+                        })}
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
             </div>
-          )}
-          {loading ? (
-            <div className="flex items-center justify-center flex-grow">
-              <RingLoader color="#F05A28" size={60} />
-            </div>
-          ) : error ? (
-            <p className="text-red-500">{error}</p>
-          ) : (
-            <div className="flex-grow">
-              <table className="min-w-full bg-white shadow-lg rounded-lg text-center">
-                <thead>
-                  <tr>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Title
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Created At
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reports.length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="py-3 px-6 text-gray-600">
-                        No reports available. Check back later.
-                      </td>
-                    </tr>
+
+            {loading ? (
+              <div className="flex justify-center items-center flex-1">
+                <RingLoader color="#FE633D" />
+              </div>
+            ) : (
+              <div className="overflow-auto flex-1">
+                {reportType && report ? (
+                  reportType === "user" ? (
+                    <UserReport report={report} />
                   ) : (
-                    reports.map((report) => (
-                      <tr
-                        key={report.id}
-                        className="border-b hover:bg-gray-50 transition-colors duration-300"
-                      >
-                        <td className="py-3 px-6">{report.title}</td>
-                        <td className="py-3 px-6">
-                          {new Date(report.createdAt).toLocaleDateString()}
-                        </td>
-                        <td
-                          className="py-3 px-6 relative"
-                          ref={
-                            actionsRef as React.RefObject<HTMLTableDataCellElement>
-                          }
-                        >
-                          <button
-                            onClick={() =>
-                              setActiveReportId(
-                                activeReportId === report.id ? null : report.id
-                              )
-                            }
-                            className="focus:outline-none"
-                          >
-                            <FontAwesomeIcon icon={faEllipsisH} />
-                          </button>
-                          {activeReportId === report.id && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                              {actionLoading === report.id ? (
-                                <div className="flex items-center justify-center p-2">
-                                  <RingLoader color="#F05A28" size={30} />
-                                </div>
-                              ) : (
-                                <>
-                                  <button
-                                    onClick={() => handleViewReport(report.id)}
-                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faEye}
-                                      className="mr-2"
-                                    />
-                                    View
-                                  </button>
-                                  <button
-                                    onClick={() => handleEditReport(report.id)}
-                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faEdit}
-                                      className="mr-2"
-                                    />
-                                    Edit
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteReport(report.id)
-                                    }
-                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faTrashAlt}
-                                      className="mr-2"
-                                    />
-                                    Delete
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+                    "Company Report"
+                  )
+                ) : (
+                  <div className="text-center text-gray-600">
+                    {error ? (
+                      <p>{error}</p>
+                    ) : (
+                      <p>Select a report type and generate a report.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </main>
       </div>
     </div>

@@ -36,6 +36,20 @@ const TransactionsPage: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, [navigate]);
+
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -108,20 +122,6 @@ const TransactionsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
-
-    return () => clearInterval(interval);
-  }, [navigate]);
-
-  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -136,7 +136,7 @@ const TransactionsPage: React.FC = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
           <h1 className="text-3xl font-bold text-white">Transactions</h1>
           <div className="relative" ref={dropdownRef}>
             <button

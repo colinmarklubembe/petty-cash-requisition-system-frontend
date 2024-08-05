@@ -38,6 +38,20 @@ const SettingsPage = () => {
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
+  useEffect(() => {
+    const checkSession = () => {
+      if (isSessionExpired()) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    };
+
+    checkSession();
+    const interval = setInterval(checkSession, 60000);
+
+    return () => clearInterval(interval);
+  }, [navigate]);
+
   const handleClickOutside = (event: MouseEvent) => {
     if (
       dropdownRef.current &&
@@ -116,20 +130,6 @@ const SettingsPage = () => {
   }, []);
 
   useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
-
-    return () => clearInterval(interval);
-  }, [navigate]);
-
-  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -138,7 +138,7 @@ const SettingsPage = () => {
 
   // Simulate a delay for loading
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000); // Simulate 2 seconds loading time
+    const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -150,7 +150,7 @@ const SettingsPage = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center relative">
+        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
           <h1 className="text-3xl font-bold text-white">Settings</h1>
           <div className="relative" ref={dropdownRef}>
             <button
@@ -314,7 +314,7 @@ const SettingsPage = () => {
                       </div>
                       <button
                         type="submit"
-                        disabled={isSubmitting} // Disable button when submitting
+                        disabled={isSubmitting}
                         className="relative bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
                       >
                         <span
