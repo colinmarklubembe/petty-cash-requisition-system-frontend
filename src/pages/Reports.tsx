@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FiMenu, FiX, FiBell, FiSettings, FiUser } from "react-icons/fi";
 import Sidebar from "../components/ui/SideBar";
 import { reportApi, userApi } from "../api";
-import { Report } from "../types/Report";
+import { CompanyReport, UserReport } from "../types/Report";
 import { UserCompany } from "../types/User";
 import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
-import UserReport from "../components/views/UserReport";
+import UserReportView from "../components/views/UserReportView";
 import DownloadButton from "../components/ui/DownloadReport";
+import CompanyReportView from "../components/views/CompanyReportView";
 
 const ReportsPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -19,7 +20,10 @@ const ReportsPage: React.FC = () => {
   const [users, setUsers] = useState<UserCompany[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
-  const [report, setReport] = useState<Report | null>(null);
+  const [userReport, setUserReport] = useState<UserReport | null>(null);
+  const [companyReport, setCompanyReport] = useState<CompanyReport | null>(
+    null
+  );
   const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -49,12 +53,15 @@ const ReportsPage: React.FC = () => {
       const selectedDate = selectedMonth
         ? `${new Date().getFullYear()}-${selectedMonth}-01`
         : undefined;
+
       if (reportType === "user" && selectedUserId) {
         response = await reportApi.getUserReport(selectedUserId, selectedDate);
-        setReport(response.data);
+        setUserReport(response.data);
+        setCompanyReport(null); // Ensure company report is cleared
       } else if (reportType === "company") {
-        // response = await reportApi.getCompanyReport(selectedDate);
-        // setReport(response.data);
+        response = await reportApi.getCompanyReport(selectedDate);
+        setCompanyReport(response.data);
+        setUserReport(null); // Ensure user report is cleared
       }
     } catch (error) {
       setError("Failed to fetch reports. Please try again.");
@@ -62,6 +69,24 @@ const ReportsPage: React.FC = () => {
       setLoading(false);
     }
   }, [reportType, selectedUserId, selectedMonth]);
+
+  useEffect(() => {
+    if (reportType) {
+      if (reportType === "user" && !users.length) {
+        const fetchUsers = async () => {
+          try {
+            const response = await userApi.getCompanyUsers();
+            setUsers(response.data);
+          } catch (error) {
+            setError("Failed to fetch users. Please try again.");
+          }
+        };
+        fetchUsers();
+      } else {
+        fetchReports();
+      }
+    }
+  }, [fetchReports, reportType, users]);
 
   useEffect(() => {
     if (reportType) {
@@ -206,9 +231,11 @@ const ReportsPage: React.FC = () => {
               >
                 Generate Company Report
               </button>
-              {report && (
+              {(userReport || companyReport) && (
                 <DownloadButton
-                  data={report}
+                  reportData={
+                    (userReport || companyReport) as UserReport | CompanyReport
+                  }
                   fileName={`report_${reportType}_${
                     selectedMonth || "all"
                   }.pdf`}
@@ -231,7 +258,7 @@ const ReportsPage: React.FC = () => {
                     <option value="">Select a user</option>
                     {users.map((user) => (
                       <option key={user.user.id} value={user.user.id}>
-                        {user.user.firstName} ({user.role})
+                        {user.user.firstName}({user.role})
                       </option>
                     ))}
                   </select>
@@ -249,11 +276,11 @@ const ReportsPage: React.FC = () => {
                   className="p-2 border rounded-lg bg-white text-gray-700 border-gray-300"
                 >
                   <option value="">Select a month</option>
-                  {Array.from({ length: 12 }, (_, index) => {
-                    const month = (index + 1).toString().padStart(2, "0");
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const month = (i + 1).toString().padStart(2, "0");
                     return (
                       <option key={month} value={month}>
-                        {new Date(0, index).toLocaleString("default", {
+                        {new Date(0, i).toLocaleString("default", {
                           month: "long",
                         })}
                       </option>
@@ -262,28 +289,22 @@ const ReportsPage: React.FC = () => {
                 </select>
               </div>
             </div>
+          </div>
 
+          <div className="bg-white shadow-md rounded-lg p-6 flex-grow overflow-auto">
             {loading ? (
-              <div className="flex justify-center items-center flex-1">
+              <div className="flex justify-center items-center h-full">
                 <RingLoader color="#FE633D" />
               </div>
+            ) : error ? (
+              <div className="text-red-500">{error}</div>
+            ) : userReport ? (
+              <UserReportView report={userReport} />
+            ) : companyReport ? (
+              <CompanyReportView report={companyReport} />
             ) : (
-              <div className="overflow-auto flex-1">
-                {reportType && report ? (
-                  reportType === "user" ? (
-                    <UserReport report={report} />
-                  ) : (
-                    "Company Report"
-                  )
-                ) : (
-                  <div className="text-center text-gray-600">
-                    {error ? (
-                      <p>{error}</p>
-                    ) : (
-                      <p>Select a report type and generate a report.</p>
-                    )}
-                  </div>
-                )}
+              <div className="text-center text-gray-500">
+                Please select a report type to generate.
               </div>
             )}
           </div>

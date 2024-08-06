@@ -17,6 +17,7 @@ import Modal from "../components/ui/Modal";
 import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
+import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
 
 const PettyFundsPage: React.FC = () => {
   const [funds, setFunds] = useState<PettyFund[]>([]);
@@ -27,6 +28,8 @@ const PettyFundsPage: React.FC = () => {
   const [selectedFund, setSelectedFund] = useState<PettyFund | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
+    useState(false);
   const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -86,6 +89,7 @@ const PettyFundsPage: React.FC = () => {
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
+        setShowSessionExpiredDialog(true);
         localStorage.clear();
         navigate("/login");
       }
@@ -335,6 +339,11 @@ const PettyFundsPage: React.FC = () => {
           )}
         </main>
       </div>
+      {showSessionExpiredDialog && (
+        <SessionExpiredDialog
+          onClose={() => setShowSessionExpiredDialog(false)}
+        />
+      )}
     </div>
   );
 };

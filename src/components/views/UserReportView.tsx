@@ -1,18 +1,19 @@
 import React from "react";
-import { Report } from "../../types/Report";
+import { UserReport } from "../../types/Report";
 import { Requisition } from "../../types/Requisition";
 import { Transaction } from "../../types/Transaction";
 
 interface UserReportProps {
-  report: Report;
+  report: UserReport;
 }
 
-const UserReport: React.FC<UserReportProps> = ({ report }) => {
+const UserReportView: React.FC<UserReportProps> = ({ report }) => {
   const { user, report: reportData } = report;
   const { userMonthlyRequisitions, userMonthlyTransactions } = reportData;
   const { currentMonthRequisitions, totalMonthlyRequisitions } =
     userMonthlyRequisitions;
-  const { currentMonthTransactions } = userMonthlyTransactions;
+  const { currentMonthTransactions, totalMonthlyTransactions } =
+    userMonthlyTransactions;
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 space-y-6 border-[#202046]">
@@ -66,6 +67,9 @@ const UserReport: React.FC<UserReportProps> = ({ report }) => {
         <h3 className="text-xl font-semibold text-gray-700 mb-4">
           Monthly Transactions
         </h3>
+        <p className="text-gray-700">
+          Total Transactions: {totalMonthlyTransactions}
+        </p>
         {currentMonthTransactions.transactions.length > 0 ? (
           <ul className="mt-4 space-y-4">
             {currentMonthTransactions.transactions.map(
@@ -94,4 +98,4 @@ const UserReport: React.FC<UserReportProps> = ({ report }) => {
   );
 };
 
-export default UserReport;
+export default UserReportView;

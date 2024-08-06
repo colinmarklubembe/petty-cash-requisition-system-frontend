@@ -17,6 +17,7 @@ import { requisitionApi } from "../api";
 import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
+import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
 
 const RequisitionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ const RequisitionsPage: React.FC = () => {
     useState<Requisition | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
+    useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
@@ -42,6 +45,7 @@ const RequisitionsPage: React.FC = () => {
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
+        setShowSessionExpiredDialog(true);
         localStorage.clear();
         navigate("/login");
       }
@@ -336,6 +340,11 @@ const RequisitionsPage: React.FC = () => {
           )}
         </main>
       </div>
+      {showSessionExpiredDialog && (
+        <SessionExpiredDialog
+          onClose={() => setShowSessionExpiredDialog(false)}
+        />
+      )}
     </div>
   );
 };

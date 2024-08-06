@@ -7,6 +7,7 @@ import CreateCompany from "../components/forms/CreateCompany";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
 import { companyApi } from "../api";
+import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
 
 const CompaniesPage = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -14,6 +15,8 @@ const CompaniesPage = () => {
     { company: Company; role: string }[]
   >([]);
   const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
+    useState(false);
   const navigate = useNavigate();
   const formRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,6 +36,7 @@ const CompaniesPage = () => {
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
+        setShowSessionExpiredDialog(true);
         localStorage.clear();
         navigate("/login");
       }
@@ -177,6 +181,11 @@ const CompaniesPage = () => {
             />
           </div>
         </div>
+      )}
+      {showSessionExpiredDialog && (
+        <SessionExpiredDialog
+          onClose={() => setShowSessionExpiredDialog(false)}
+        />
       )}
     </div>
   );

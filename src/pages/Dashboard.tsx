@@ -18,6 +18,7 @@ import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
 import "chart.js/auto";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
+import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -26,6 +27,8 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
+    useState(false);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
@@ -33,6 +36,7 @@ const Dashboard = () => {
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
+        setShowSessionExpiredDialog(true);
         localStorage.clear();
         navigate("/login");
       }
@@ -313,6 +317,11 @@ const Dashboard = () => {
           )}
         </main>
       </div>
+      {showSessionExpiredDialog && (
+        <SessionExpiredDialog
+          onClose={() => setShowSessionExpiredDialog(false)}
+        />
+      )}
     </div>
   );
 };

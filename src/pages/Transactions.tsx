@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
 import TransactionDetailsView from "../components/views/Transaction";
 import Modal from "../components/ui/Modal";
+import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
 
 const TransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -32,6 +33,8 @@ const TransactionsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
+    useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
@@ -39,6 +42,7 @@ const TransactionsPage: React.FC = () => {
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
+        setShowSessionExpiredDialog(true);
         localStorage.clear();
         navigate("/login");
       }
@@ -353,6 +357,11 @@ const TransactionsPage: React.FC = () => {
           >
             <TransactionDetailsView transaction={selectedTransaction} />
           </Modal>
+        )}
+        {showSessionExpiredDialog && (
+          <SessionExpiredDialog
+            onClose={() => setShowSessionExpiredDialog(false)}
+          />
         )}
       </div>
     </div>

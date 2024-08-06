@@ -22,6 +22,26 @@ class ReportApi {
 
     return response.data;
   }
+
+  async getCompanyReport(selectedDate?: string) {
+    const token = localStorage.getItem("token");
+    const companyId = localStorage.getItem("companyId");
+
+    const url = new URL(`${API_URL}/company`);
+
+    if (selectedDate) {
+      url.searchParams.append("selectedDate", selectedDate);
+    }
+
+    const response = await axios.get(url.toString(), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "company-id": `${companyId}`,
+      },
+    });
+
+    return response.data;
+  }
 }
 
 const reportApi = new ReportApi();

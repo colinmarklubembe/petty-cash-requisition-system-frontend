@@ -15,6 +15,7 @@ import { isSessionExpired } from "../utils/session";
 import settingsApi from "../api/settings";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
 
 const SettingsPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -32,6 +33,8 @@ const SettingsPage = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
+    useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -41,6 +44,7 @@ const SettingsPage = () => {
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
+        setShowSessionExpiredDialog(true);
         localStorage.clear();
         navigate("/login");
       }
@@ -407,6 +411,11 @@ const SettingsPage = () => {
         </main>
       </div>
       <ToastContainer />
+      {showSessionExpiredDialog && (
+        <SessionExpiredDialog
+          onClose={() => setShowSessionExpiredDialog(false)}
+        />
+      )}
     </div>
   );
 };

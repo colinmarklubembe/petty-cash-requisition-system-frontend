@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/ui/SideBar";
 import {
   FiBell,
@@ -6,8 +6,9 @@ import {
   FiUser,
   FiMenu,
   FiX,
+  FiMoreHorizontal,
   FiEdit,
-  FiTrash2,
+  FiTrash,
 } from "react-icons/fi";
 import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +18,7 @@ import { UserCompany } from "../types/User";
 import InviteUser, {
   InviteUserFormInputs,
 } from "../components/forms/InviteUser";
+import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
 
 const UserManagementPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -25,9 +27,13 @@ const UserManagementPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<UserCompany[]>([]);
   const [showInviteUserModal, setShowInviteUserModal] = useState(false);
+  const [activeUserId, setActiveUserId] = useState<string | null>(null);
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
+    useState(false);
 
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const actionsRef = useRef<HTMLDivElement | null>(null);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
@@ -35,6 +41,7 @@ const UserManagementPage = () => {
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
+        setShowSessionExpiredDialog(true);
         localStorage.clear();
         navigate("/login");
       }
@@ -70,12 +77,22 @@ const UserManagementPage = () => {
     ) {
       setDropdownOpen(false);
     }
+    if (
+      actionsRef.current &&
+      !actionsRef.current.contains(event.target as Node)
+    ) {
+      setActiveUserId(null);
+    }
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside as EventListener);
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside as EventListener
+      );
     };
   }, []);
 
@@ -95,10 +112,7 @@ const UserManagementPage = () => {
         role: newUserInput.role,
       };
 
-      // Update the state with the new user
-      setUsers((prevUsers: any) => [...prevUsers, newUser]);
-
-      // Close the invite user modal
+      setUsers((prevUsers) => [...prevUsers, newUser]);
       setShowInviteUserModal(false);
     } catch (error) {
       setError("Failed to invite user. Please try again.");
@@ -106,12 +120,10 @@ const UserManagementPage = () => {
   };
 
   const handleEditUser = (userId: string) => {
-    // Implement edit user logic here
     alert(`Edit user functionality for user ID ${userId} to be implemented.`);
   };
 
   const handleDeleteUser = (userId: string) => {
-    // Implement delete user logic here
     alert(`Delete user functionality for user ID ${userId} to be implemented.`);
   };
 
@@ -212,58 +224,90 @@ const UserManagementPage = () => {
           )}
 
           {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <RingLoader color="#FE633D" size={60} />
+            <div className="flex items-center justify-center h-64">
+              <RingLoader color="#FE633D" />
             </div>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <div className="text-red-500">{error}</div>
           ) : (
-            <section className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow mb-6">
-              <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                <FiUser className="mr-2" /> Manage Users
-              </h2>
-              <table className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <thead>
-                  <tr className="bg-[#202046] text-white">
-                    <th className="py-2 px-4 text-left">Name</th>
-                    <th className="py-2 px-4 text-left">Email</th>
-                    <th className="py-2 px-4 text-left">Role</th>
-                    <th className="py-2 px-4 text-left">Actions</th>
+            <div>
+              <table className="min-w-full bg-white shadow-md rounded-lg">
+                <thead className="bg-gray-200 border-b">
+                  <tr className="text-center">
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Role
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
-                  {users.map((user, index) => (
-                    <tr
-                      key={user.user.id}
-                      className={`${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      } border-t hover:bg-gray-100`}
-                    >
-                      <td className="py-2 px-4">{`${user.user.firstName} ${user.user.lastName}`}</td>
-                      <td className="py-2 px-4">{user.user.email}</td>
-                      <td className="py-2 px-4">{user.role}</td>
-                      <td className="py-2 px-4 flex space-x-4">
-                        <button
-                          onClick={() => handleEditUser(user.user.id)}
-                          className="text-blue-600 hover:underline flex items-center"
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {users.map((user) => (
+                    <tr key={user.user.id} className="text-center">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {user.user.firstName} {user.user.lastName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {user.user.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {user.role}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div
+                          className="relative inline-block text-center"
+                          ref={actionsRef}
                         >
-                          <FiEdit className="mr-1" /> Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(user.user.id)}
-                          className="text-red-600 hover:underline flex items-center"
-                        >
-                          <FiTrash2 className="mr-1" /> Delete
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveUserId(user.user.id)}
+                            className="inline-flex items-center p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                          >
+                            <FiMoreHorizontal className="h-6 w-6" />
+                          </button>
+                          {activeUserId === user.user.id && (
+                            <div
+                              className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg w-48"
+                              ref={actionsRef}
+                            >
+                              <button
+                                onClick={() => handleEditUser(user.user.id)}
+                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                              >
+                                <FiEdit className="h-5 w-5 mr-2 text-[#FE633D]" />
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteUser(user.user.id)}
+                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                              >
+                                <FiTrash className="h-5 w-5 mr-2 text-[#FE633D]" />
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </section>
+            </div>
           )}
         </main>
       </div>
+      {showSessionExpiredDialog && (
+        <SessionExpiredDialog
+          onClose={() => setShowSessionExpiredDialog(false)}
+        />
+      )}
     </div>
   );
 };

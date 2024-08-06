@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
+import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
 
 const ApprovalsPage: React.FC = () => {
   const [approvals, setApprovals] = useState<Requisition[]>([]);
@@ -22,12 +23,15 @@ const ApprovalsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
+    useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const checkSession = () => {
       if (isSessionExpired()) {
+        setShowSessionExpiredDialog(true);
         localStorage.clear();
         navigate("/login");
       }
@@ -84,6 +88,7 @@ const ApprovalsPage: React.FC = () => {
   };
 
   const fetchApprovals = useCallback(async () => {
+    setLoading(true);
     setError(null);
     try {
       const response = await requisitionApi.getAllRequisitions();
@@ -185,7 +190,7 @@ const ApprovalsPage: React.FC = () => {
         <main className="p-6 flex flex-col h-full">
           {loading ? (
             <div className="flex items-center justify-center flex-grow">
-              <RingLoader color="#F05A28" size={60} />
+              <RingLoader color="#FE633D" size={60} />
             </div>
           ) : error ? (
             <p className="text-red-500">{error}</p>
@@ -217,60 +222,50 @@ const ApprovalsPage: React.FC = () => {
                     </tr>
                   ) : (
                     approvals.map((approval) => (
-                      <tr
-                        key={approval.id}
-                        className="border-b hover:bg-gray-50"
-                      >
-                        <td className="py-3 px-6">{approval.description}</td>
-                        <td className="py-3 px-6">{approval.amount}</td>
-                        <td className="py-3 px-6">
-                          <span
-                            className={`py-1 px-3 rounded-full text-xs ${
-                              approval.requisitionStatus === "DRAFTS"
-                                ? "bg-gray-200 text-gray-600"
-                                : approval.requisitionStatus === "APPROVED"
-                                ? "bg-green-200 text-green-600"
-                                : approval.requisitionStatus === "REJECTED"
-                                ? "bg-red-200 text-red-600"
-                                : "bg-yellow-200 text-yellow-600"
-                            }`}
-                          >
-                            {approval.requisitionStatus}
-                          </span>
+                      <tr key={approval.id}>
+                        <td className="py-4 px-6 border-b">
+                          {approval.description}
                         </td>
-                        <td className="py-3 px-6">
-                          <div className="flex justify-center space-x-2">
-                            <button
-                              onClick={() => handleApprove(approval.id)}
-                              className="flex items-center px-3 py-1 border border-green-300 text-green-700 rounded-full bg-green-100 hover:bg-green-200 text-sm"
-                            >
-                              <FontAwesomeIcon
-                                icon={faCheckCircleSolid}
-                                className="text-base"
-                              />
-                              <span className="ml-1">Approve</span>
-                            </button>
-                            <button
-                              onClick={() => handleStall(approval.id)}
-                              className="flex items-center px-3 py-1 border border-yellow-300 text-yellow-700 rounded-full bg-yellow-100 hover:bg-yellow-200 text-sm"
-                            >
-                              <FontAwesomeIcon
-                                icon={faPauseCircleSolid}
-                                className="text-base"
-                              />
-                              <span className="ml-1">Stall</span>
-                            </button>
-                            <button
-                              onClick={() => handleReject(approval.id)}
-                              className="flex items-center px-3 py-1 border border-red-300 text-red-700 rounded-full bg-red-100 hover:bg-red-200 text-sm"
-                            >
-                              <FontAwesomeIcon
-                                icon={faTimesCircleSolid}
-                                className="text-base"
-                              />
-                              <span className="ml-1">Reject</span>
-                            </button>
-                          </div>
+                        <td className="py-4 px-6 border-b">
+                          {approval.amount}
+                        </td>
+                        <td className="py-4 px-6 border-b">
+                          {approval.requisitionStatus === "APPROVED" ? (
+                            <FontAwesomeIcon
+                              icon={faCheckCircleSolid}
+                              className="text-green-500"
+                            />
+                          ) : approval.requisitionStatus === "REJECTED" ? (
+                            <FontAwesomeIcon
+                              icon={faTimesCircleSolid}
+                              className="text-red-500"
+                            />
+                          ) : (
+                            <FontAwesomeIcon
+                              icon={faPauseCircleSolid}
+                              className="text-yellow-500"
+                            />
+                          )}
+                        </td>
+                        <td className="py-4 px-6 border-b">
+                          <button
+                            onClick={() => handleApprove(approval.id)}
+                            className="text-green-500 hover:text-green-700"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleReject(approval.id)}
+                            className="text-red-500 hover:text-red-700 ml-4"
+                          >
+                            Reject
+                          </button>
+                          <button
+                            onClick={() => handleStall(approval.id)}
+                            className="text-yellow-500 hover:text-yellow-700 ml-4"
+                          >
+                            Stall
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -280,8 +275,14 @@ const ApprovalsPage: React.FC = () => {
             </div>
           )}
         </main>
+
+        <ToastContainer position="bottom-right" />
       </div>
-      <ToastContainer />
+      {showSessionExpiredDialog && (
+        <SessionExpiredDialog
+          onClose={() => setShowSessionExpiredDialog(false)}
+        />
+      )}
     </div>
   );
 };
