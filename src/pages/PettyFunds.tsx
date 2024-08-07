@@ -18,6 +18,7 @@ import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
 import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
+import EditPettyFundForm from "../components/forms/EditPettyFund";
 
 const PettyFundsPage: React.FC = () => {
   const [funds, setFunds] = useState<PettyFund[]>([]);
@@ -25,6 +26,8 @@ const PettyFundsPage: React.FC = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [activeFundId, setActiveFundId] = useState<string | null>(null);
   const [showCreateFundModal, setShowCreateFundModal] = useState(false);
+  const [showEditFundModal, setShowEditFundModal] = useState(false);
+  const [editFundData, setEditFundData] = useState<PettyFund | null>(null);
   const [selectedFund, setSelectedFund] = useState<PettyFund | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +61,21 @@ const PettyFundsPage: React.FC = () => {
   };
 
   const handleEditFund = (id: string) => {
+    const fund = funds.find((fund) => fund.id === id);
+    if (fund) {
+      setEditFundData(fund);
+      setShowEditFundModal(true);
+    }
     setDropdownOpen(false);
+  };
+
+  const handleUpdateFund = (updatedPettyFund: PettyFundFormInputs) => {
+    setFunds((prevFunds) =>
+      prevFunds.map((fund) =>
+        fund.id === editFundData?.id ? { ...fund, ...updatedPettyFund } : fund
+      )
+    );
+    fetchPettyCashFunds();
   };
 
   const handleDeleteFund = (id: string) => {
@@ -343,6 +360,18 @@ const PettyFundsPage: React.FC = () => {
         <SessionExpiredDialog
           onClose={() => setShowSessionExpiredDialog(false)}
         />
+      )}
+      {showEditFundModal && editFundData && (
+        <Modal isVisible={true} onClose={() => setShowEditFundModal(false)}>
+          <EditPettyFundForm
+            initialData={editFundData}
+            onSubmit={(updatedFund) => {
+              handleUpdateFund(updatedFund);
+              setShowEditFundModal(false);
+            }}
+            onClose={() => setShowEditFundModal(false)}
+          />
+        </Modal>
       )}
     </div>
   );
