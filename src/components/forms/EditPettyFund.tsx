@@ -52,7 +52,6 @@ const EditPettyFundForm: React.FC<EditPettyFundFormProps> = ({
         data
       );
       setToastMessage(response.message);
-      console.log("Petty Fund Updated Successfully! ", response);
       onSubmit(data);
       onClose();
     } catch (error: any) {

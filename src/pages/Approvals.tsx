@@ -32,8 +32,7 @@ const ApprovalsPage: React.FC = () => {
 
   const handleApprove = async (id: string) => {
     try {
-      const response = await approvalApi.approveRequisition(id);
-      console.log("Requisition approved: ", response);
+      await approvalApi.approveRequisition(id);
       await fetchApprovals();
       toast.success("Requisition approved successfully!");
     } catch (error: any) {
@@ -44,8 +43,7 @@ const ApprovalsPage: React.FC = () => {
 
   const handleReject = async (id: string) => {
     try {
-      const response = await approvalApi.rejectRequisition(id);
-      console.log("Requisition rejected: ", response);
+      await approvalApi.rejectRequisition(id);
       await fetchApprovals();
       toast.success("Requisition rejected successfully!");
     } catch (error: any) {
@@ -56,8 +54,7 @@ const ApprovalsPage: React.FC = () => {
 
   const handleStall = async (id: string) => {
     try {
-      const response = await approvalApi.stallRequisition(id);
-      console.log("Requisition stalled: ", response);
+      await approvalApi.stallRequisition(id);
       await fetchApprovals();
       toast.success("Requisition stalled successfully!");
     } catch (error: any) {

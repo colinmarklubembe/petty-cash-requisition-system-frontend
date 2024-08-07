@@ -53,7 +53,6 @@ const CreateTransaction: React.FC<CreateTransactionProps> = ({
     try {
       const response = await transactionApi.createTransaction(data);
       setToastMessage(response.message);
-      console.log("Transaction Created Successfully! ", response);
       onCreate(data);
       onClose();
     } catch (error: any) {

@@ -60,7 +60,6 @@ const EditCompany: React.FC<EditCompanyProps> = ({
     try {
       const response = await companyApi.editCompany(companyId, data);
       setToastMessage(response.message);
-      console.log("Company Updated Successfully! ", response);
       onEdit(data);
       onClose();
     } catch (error: any) {

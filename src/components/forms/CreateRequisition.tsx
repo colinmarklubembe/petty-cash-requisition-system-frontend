@@ -58,7 +58,6 @@ const CreateRequisition: React.FC<CreateRequisitionProps> = ({
     try {
       const response = await requisitionApi.createRequisition(data);
       setToastMessage(response.message);
-      console.log("Requisition Created Successfully! ", response);
       onCreate(data);
       onClose();
     } catch (error: any) {

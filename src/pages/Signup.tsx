@@ -27,7 +27,6 @@ const Signup = () => {
     try {
       const response = await authApi.signup(data);
       setToastMessage(response.message);
-      console.log("Signup successful", response);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error || "Signup failed. Please try again.";

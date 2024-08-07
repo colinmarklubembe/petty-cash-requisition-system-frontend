@@ -38,7 +38,6 @@ const CreatePettyFundForm: React.FC<CreatePettyFundFormProps> = ({
     try {
       const response = await pettyCashApi.createPettyCashFund(data);
       setToastMessage(response.message);
-      console.log("Petty Fund Created Successfully! ", response);
       onCreate(data);
       onClose();
     } catch (error: any) {

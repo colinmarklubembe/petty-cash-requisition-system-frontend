@@ -40,7 +40,6 @@ const Login = () => {
       localStorage.setItem("expirationTime", expirationTime.toString());
 
       navigate("/companies");
-      console.log("Login successful", response);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error || "Login failed. Please try again.";

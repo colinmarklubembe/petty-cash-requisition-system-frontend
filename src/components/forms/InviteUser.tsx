@@ -35,9 +35,8 @@ const InviteUser: React.FC<InviteUserProps> = ({ onClose, onCreate }) => {
     setToastMessage(null);
 
     try {
-      const response = await userApi.inviteUser(data);
+      await userApi.inviteUser(data);
       setToastMessage("User invited successfully!");
-      console.log("User Invited Successfully! ", response);
       onCreate(data);
       onClose();
     } catch (error: any) {

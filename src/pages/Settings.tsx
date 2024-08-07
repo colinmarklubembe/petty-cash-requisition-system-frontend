@@ -49,12 +49,11 @@ const SettingsPage = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await settingsApi.updatePassword(userData);
+      await settingsApi.updatePassword(userData);
       toast.success("Password changed successfully");
       setOldPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
-      console.log(response);
     } catch (error: any) {
       toast.error(
         error.response?.data?.error ||
@@ -71,9 +70,8 @@ const SettingsPage = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await settingsApi.updateProfile(profile);
+      await settingsApi.updateProfile(profile);
       toast.success("Profile updated successfully");
-      console.log(response);
     } catch (error: any) {
       toast.error(
         error.response?.data?.error ||
