@@ -1,23 +1,20 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEdit,
-  faTrashAlt,
-  faPlus,
-  faEllipsisH,
-  faEye,
-} from "@fortawesome/free-solid-svg-icons";
-import Sidebar from "../components/ui/SideBar";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { transactionApi } from "../api";
+import { useSessionCheck } from "../hooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Transaction, TransactionFormInputs } from "../types/Transaction";
-import CreateTransaction from "../components/forms/CreateTransaction";
-import { RingLoader } from "react-spinners";
-import { useNavigate } from "react-router-dom";
-import { isSessionExpired } from "../utils/session";
-import TransactionDetailsView from "../components/views/Transaction";
-import Modal from "../components/ui/Modal";
-import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
-import Header from "../components/ui/Header";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Modal,
+  Table,
+  Header,
+  Sidebar,
+  ActionsMenu,
+  LoadingSpinner,
+  CreateTransaction,
+  SessionExpiredDialog,
+  TransactionDetailsView,
+} from "../components";
 
 const TransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -31,25 +28,9 @@ const TransactionsPage: React.FC = () => {
     useState<Transaction | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
-    useState(false);
+  const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
+    useSessionCheck();
   const actionsRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        setShowSessionExpiredDialog(true);
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
-
-    return () => clearInterval(interval);
-  }, [navigate]);
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -116,6 +97,38 @@ const TransactionsPage: React.FC = () => {
     };
   }, []);
 
+  const columns = [
+    { key: "type" as keyof Transaction, label: "Type" },
+    { key: "amount" as keyof Transaction, label: "Amount" },
+    { key: "pettyCashFund.name" as keyof Transaction, label: "Fund" },
+    { key: "requisition.title" as keyof Transaction, label: "Requisition" },
+    { key: "actions" as keyof Transaction, label: "Actions" },
+  ];
+
+  const renderCustomCell = (
+    key: keyof Transaction | string,
+    item: Transaction
+  ) => {
+    if (key === "actions") {
+      return (
+        <ActionsMenu
+          onView={() => handleViewTransaction(item.id)}
+          onEdit={() => handleEditTransaction(item.id)}
+          onDelete={() => handleDeleteTransaction(item.id)}
+          isOpen={activeTransactionId === item.id}
+          closeMenu={() => setActiveTransactionId(null)}
+        />
+      );
+    }
+    if (key === "pettyCashFund.name") {
+      return item.pettyCashFund?.name || "N/A";
+    }
+    if (key === "requisition.title") {
+      return item.requisition?.title || "N/A";
+    }
+    return String(item[key as keyof Transaction]);
+  };
+
   return (
     <div className="flex h-screen">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
@@ -163,124 +176,16 @@ const TransactionsPage: React.FC = () => {
             </div>
           )}
           {loading ? (
-            <div className="flex items-center justify-center flex-grow">
-              <RingLoader color="#F05A28" size={60} />
-            </div>
+            <LoadingSpinner />
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
             <div className="flex-grow">
-              <table className="min-w-full bg-white shadow-lg rounded-lg text-center">
-                <thead>
-                  <tr>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Type
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Amount
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Fund
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Requisition
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-3 px-6 text-gray-600">
-                        No transactions available. Check back later.
-                      </td>
-                    </tr>
-                  ) : (
-                    transactions.map((transaction) => (
-                      <tr
-                        key={transaction.id}
-                        className="border-b hover:bg-gray-50 transition-colors duration-300"
-                      >
-                        <td className="py-3 px-6">{transaction.type}</td>
-                        <td className="py-3 px-6">{transaction.amount}</td>
-                        <td className="py-3 px-6">
-                          {transaction.pettyCashFund?.name || "N/A"}
-                        </td>
-                        <td className="py-3 px-6">
-                          {transaction.requisition?.title || "N/A"}
-                        </td>
-                        <td
-                          className="py-3 px-6 relative"
-                          ref={
-                            actionsRef as React.RefObject<HTMLTableDataCellElement>
-                          }
-                        >
-                          <button
-                            onClick={() =>
-                              setActiveTransactionId(
-                                activeTransactionId === transaction.id
-                                  ? null
-                                  : transaction.id
-                              )
-                            }
-                            className="focus:outline-none"
-                          >
-                            <FontAwesomeIcon icon={faEllipsisH} />
-                          </button>
-                          {activeTransactionId === transaction.id && (
-                            <div
-                              className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10"
-                              ref={actionsRef}
-                            >
-                              <button
-                                onClick={() => {
-                                  handleViewTransaction(transaction.id);
-                                  setActiveTransactionId(null);
-                                }}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                              >
-                                <FontAwesomeIcon
-                                  icon={faEye}
-                                  className="mr-2"
-                                />
-                                View
-                              </button>
-                              <button
-                                onClick={() => {
-                                  handleEditTransaction(transaction.id);
-                                  setActiveTransactionId(null);
-                                }}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                              >
-                                <FontAwesomeIcon
-                                  icon={faEdit}
-                                  className="mr-2"
-                                />
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => {
-                                  handleDeleteTransaction(transaction.id);
-                                  setActiveTransactionId(null);
-                                }}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
-                              >
-                                <FontAwesomeIcon
-                                  icon={faTrashAlt}
-                                  className="mr-2"
-                                />
-                                Delete
-                              </button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+              <Table
+                columns={columns}
+                data={transactions}
+                renderCustomCell={renderCustomCell}
+              />
             </div>
           )}
         </main>

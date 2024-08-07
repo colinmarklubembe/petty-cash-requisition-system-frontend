@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import Sidebar from "../components/ui/SideBar";
+import { UserCompany } from "../types/User";
 import { reportApi, userApi } from "../api";
 import { CompanyReport, UserReport } from "../types/Report";
-import { UserCompany } from "../types/User";
-import { RingLoader } from "react-spinners";
-import { useNavigate } from "react-router-dom";
-import { isSessionExpired } from "../utils/session";
-import UserReportView from "../components/views/UserReportView";
-import DownloadButton from "../components/ui/DownloadReport";
-import CompanyReportView from "../components/views/CompanyReportView";
-import Header from "../components/ui/Header";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useSessionCheck } from "../hooks";
+import {
+  Header,
+  Sidebar,
+  UserReportView,
+  LoadingSpinner,
+  DownloadButton,
+  CompanyReportView,
+  SessionExpiredDialog,
+} from "../components";
 
 const ReportsPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -23,23 +25,10 @@ const ReportsPage: React.FC = () => {
   const [companyReport, setCompanyReport] = useState<CompanyReport | null>(
     null
   );
-  const navigate = useNavigate();
+  const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
+    useSessionCheck();
 
   const actionsRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000);
-
-    return () => clearInterval(interval);
-  }, [navigate]);
 
   const fetchReports = useCallback(async () => {
     if (!reportType) return;
@@ -232,9 +221,7 @@ const ReportsPage: React.FC = () => {
 
           <div className="bg-white shadow-md rounded-lg p-6 flex-grow overflow-auto">
             {loading ? (
-              <div className="flex justify-center items-center h-full">
-                <RingLoader color="#FE633D" />
-              </div>
+              <LoadingSpinner />
             ) : error ? (
               <div className="text-red-500">{error}</div>
             ) : userReport ? (
@@ -249,6 +236,11 @@ const ReportsPage: React.FC = () => {
           </div>
         </main>
       </div>
+      {showSessionExpiredDialog && (
+        <SessionExpiredDialog
+          onClose={() => setShowSessionExpiredDialog(false)}
+        />
+      )}
     </div>
   );
 };

@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
-import Sidebar from "../components/ui/SideBar";
-import { FiBell, FiUser, FiLock } from "react-icons/fi";
 import { Tab } from "@headlessui/react";
-import { RingLoader, PulseLoader } from "react-spinners";
-import { useNavigate } from "react-router-dom";
-import { isSessionExpired } from "../utils/session";
-import settingsApi from "../api/settings";
+import { settingsApi } from "../api";
+import { PulseLoader } from "react-spinners";
+import { useSessionCheck } from "../hooks";
 import { ToastContainer, toast } from "react-toastify";
+import { FiBell, FiUser, FiLock } from "react-icons/fi";
+import React, { useState, useEffect } from "react";
+import {
+  LoadingSpinner,
+  Header,
+  SessionExpiredDialog,
+  Sidebar,
+} from "../components";
 import "react-toastify/dist/ReactToastify.css";
-import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
-import Header from "../components/ui/Header";
 
 const SettingsPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -25,26 +27,10 @@ const SettingsPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
-    useState(false);
+  const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
+    useSessionCheck();
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-
-  useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        setShowSessionExpiredDialog(true);
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000);
-
-    return () => clearInterval(interval);
-  }, [navigate]);
 
   const handleChangePassword = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -132,9 +118,7 @@ const SettingsPage = () => {
 
         <main className="mt-6 p-6">
           {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <RingLoader color="#F05A28" size={60} />
-            </div>
+            <LoadingSpinner />
           ) : (
             <div className="space-y-6">
               <Tab.Group>

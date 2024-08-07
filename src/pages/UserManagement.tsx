@@ -1,16 +1,17 @@
-import { useState, useEffect, useRef } from "react";
-import Sidebar from "../components/ui/SideBar";
-import { FiMoreHorizontal, FiEdit, FiTrash } from "react-icons/fi";
-import { RingLoader } from "react-spinners";
-import { useNavigate } from "react-router-dom";
-import { isSessionExpired } from "../utils/session";
 import { userApi } from "../api";
 import { UserCompany } from "../types/User";
-import InviteUser, {
-  InviteUserFormInputs,
-} from "../components/forms/InviteUser";
-import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
-import Header from "../components/ui/Header";
+import { useSessionCheck } from "../hooks";
+import { useState, useEffect } from "react";
+import { InviteUserFormInputs } from "../components/forms/InviteUser";
+import {
+  Table,
+  Header,
+  Sidebar,
+  InviteUser,
+  ActionsMenu,
+  LoadingSpinner,
+  SessionExpiredDialog,
+} from "../components";
 
 const UserManagementPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -19,27 +20,14 @@ const UserManagementPage = () => {
   const [users, setUsers] = useState<UserCompany[]>([]);
   const [showInviteUserModal, setShowInviteUserModal] = useState(false);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
-  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
-    useState(false);
-  const navigate = useNavigate();
-  const actionsRef = useRef<HTMLDivElement | null>(null);
+  const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
+    useSessionCheck();
 
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-
-  useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        setShowSessionExpiredDialog(true);
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000);
-
-    return () => clearInterval(interval);
-  }, [navigate]);
+  const columns = [
+    { key: "name" as keyof UserCompany, label: "Name" },
+    { key: "email" as keyof UserCompany, label: "Email" },
+    { key: "role" as keyof UserCompany, label: "Role" },
+  ];
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -56,26 +44,6 @@ const UserManagementPage = () => {
     };
 
     fetchUsers();
-  }, []);
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      actionsRef.current &&
-      !actionsRef.current.contains(event.target as Node)
-    ) {
-      setActiveUserId(null);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside as EventListener);
-
-    return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside as EventListener
-      );
-    };
   }, []);
 
   const handleInviteUser = async (newUserInput: InviteUserFormInputs) => {
@@ -109,9 +77,26 @@ const UserManagementPage = () => {
     alert(`Delete user functionality for user ID ${userId} to be implemented.`);
   };
 
+  const renderRowActions = (user: UserCompany) => (
+    <ActionsMenu
+      onEdit={() => handleEditUser(user.user.id)}
+      onDelete={() => handleDeleteUser(user.user.id)}
+      onView={() =>
+        alert(
+          `View user functionality for user ID ${user.user.id} to be implemented.`
+        )
+      }
+      isOpen={activeUserId === user.user.id}
+      closeMenu={() => setActiveUserId(null)}
+    />
+  );
+
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        toggleSidebar={() => setSidebarOpen((prev) => !prev)}
+      />
       <div
         className={`flex-1 transition-all duration-300 ${
           isSidebarOpen ? "ml-56" : "ml-12"
@@ -157,82 +142,27 @@ const UserManagementPage = () => {
           )}
 
           {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <RingLoader color="#FE633D" />
-            </div>
+            <LoadingSpinner />
           ) : error ? (
             <div className="text-red-500">{error}</div>
           ) : (
-            <div>
-              <table className="min-w-full bg-white shadow-md rounded-lg">
-                <thead className="bg-gray-200 border-b">
-                  <tr className="text-center">
-                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Email
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {users.map((user) => (
-                    <tr key={user.user.id} className="text-center">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {user.user.firstName} {user.user.lastName}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {user.user.email}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {user.role}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div
-                          className="relative inline-block text-center"
-                          ref={actionsRef}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => setActiveUserId(user.user.id)}
-                            className="inline-flex items-center p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                          >
-                            <FiMoreHorizontal className="h-6 w-6" />
-                          </button>
-                          {activeUserId === user.user.id && (
-                            <div
-                              className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg w-48"
-                              ref={actionsRef}
-                            >
-                              <button
-                                onClick={() => handleEditUser(user.user.id)}
-                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                              >
-                                <FiEdit className="h-5 w-5 mr-2 text-[#FE633D]" />
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => handleDeleteUser(user.user.id)}
-                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                              >
-                                <FiTrash className="h-5 w-5 mr-2 text-[#FE633D]" />
-                                Delete
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table
+              columns={columns}
+              data={users}
+              renderRowActions={renderRowActions}
+              renderCustomCell={(key: any, item) => {
+                if (key === "name") {
+                  return `${item.user.firstName} ${item.user.lastName}`;
+                }
+                if (key === "email") {
+                  return item.user.email;
+                }
+                if (key === "role") {
+                  return item.role;
+                }
+                return "";
+              }}
+            />
           )}
         </main>
       </div>

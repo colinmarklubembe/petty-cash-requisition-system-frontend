@@ -1,13 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Company, CompanyResponse } from "../types/Company";
-import { CompanyFormInputs } from "../components/forms/CreateCompany";
-import CreateCompany from "../components/forms/CreateCompany";
-import { useNavigate } from "react-router-dom";
-import { isSessionExpired } from "../utils/session";
 import { companyApi } from "../api";
-import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
+import { useNavigate } from "react-router-dom";
+import { useSessionCheck } from "../hooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { CompanyFormInputs } from "../components/forms/CreateCompany";
+import { Company, CompanyResponse } from "../types/Company";
+import { useState, useEffect, useRef } from "react";
+import { SessionExpiredDialog, CreateCompany } from "../components";
 
 const CompaniesPage = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -15,8 +14,9 @@ const CompaniesPage = () => {
     { company: Company; role: string }[]
   >([]);
   const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
-  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
-    useState(false);
+  const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
+    useSessionCheck();
+
   const navigate = useNavigate();
   const formRef = useRef<HTMLDivElement | null>(null);
 
@@ -32,21 +32,6 @@ const CompaniesPage = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        setShowSessionExpiredDialog(true);
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000);
-
-    return () => clearInterval(interval);
-  }, [navigate]);
 
   useEffect(() => {
     const fetchCompanies = async () => {

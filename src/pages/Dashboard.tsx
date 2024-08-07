@@ -1,5 +1,7 @@
+import "chart.js/auto";
+import { useSessionCheck } from "../hooks";
 import { useState, useEffect } from "react";
-import Sidebar from "../components/ui/SideBar";
+import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
 import {
   FiDollarSign,
   FiTrendingUp,
@@ -8,38 +10,22 @@ import {
   FiPieChart,
   FiBriefcase,
 } from "react-icons/fi";
-import { RingLoader } from "react-spinners";
-import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
-import "chart.js/auto";
-import { useNavigate } from "react-router-dom";
-import { isSessionExpired } from "../utils/session";
-import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
-import Header from "../components/ui/Header";
+import {
+  Header,
+  Sidebar,
+  LoadingSpinner,
+  SessionExpiredDialog,
+} from "../components";
+
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
-    useState(false);
+  const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
+    useSessionCheck();
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-
-  useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        setShowSessionExpiredDialog(true);
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000);
-
-    return () => clearInterval(interval);
-  }, [navigate]);
 
   // Simulate data fetching
   useEffect(() => {
@@ -194,9 +180,7 @@ const Dashboard = () => {
 
         <main className="mt-6 p-6">
           {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <RingLoader color="#FE633D" size={60} />
-            </div>
+            <LoadingSpinner />
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (

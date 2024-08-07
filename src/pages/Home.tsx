@@ -1,5 +1,5 @@
 import {
-  Header,
+  HeaderSection,
   HeroSection,
   FeaturesSection,
   Testimonials,
@@ -9,7 +9,7 @@ import {
 
 const Home = () => (
   <div>
-    <Header />
+    <HeaderSection />
     <HeroSection />
     <FeaturesSection />
     <Testimonials />

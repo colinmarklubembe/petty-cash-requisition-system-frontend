@@ -1,44 +1,30 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { Requisition } from "../types/Requisition";
+import { useSessionCheck } from "../hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ToastContainer, toast } from "react-toastify";
+import { requisitionApi, approvalApi } from "../api";
+import React, { useState, useEffect, useCallback } from "react";
+import "react-toastify/dist/ReactToastify.css";
 import {
   faCheckCircle as faCheckCircleSolid,
   faTimesCircle as faTimesCircleSolid,
   faPauseCircle as faPauseCircleSolid,
 } from "@fortawesome/free-solid-svg-icons";
-import Sidebar from "../components/ui/SideBar";
-import { requisitionApi, approvalApi } from "../api";
-import { Requisition } from "../types/Requisition";
-import { RingLoader } from "react-spinners";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-import { isSessionExpired } from "../utils/session";
-import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
-import Header from "../components/ui/Header";
+import {
+  Table,
+  Header,
+  Sidebar,
+  LoadingSpinner,
+  SessionExpiredDialog,
+} from "../components";
 
 const ApprovalsPage: React.FC = () => {
   const [approvals, setApprovals] = useState<Requisition[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
-    useState(false);
-
-  useEffect(() => {
-    const checkSession = () => {
-      if (isSessionExpired()) {
-        setShowSessionExpiredDialog(true);
-        localStorage.clear();
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-    const interval = setInterval(checkSession, 60000);
-
-    return () => clearInterval(interval);
-  }, [navigate]);
+  const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
+    useSessionCheck();
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -105,6 +91,39 @@ const ApprovalsPage: React.FC = () => {
     fetchApprovals();
   }, [fetchApprovals]);
 
+  const columns = [
+    { key: "description" as keyof Requisition, label: "Description" },
+    { key: "amount" as keyof Requisition, label: "Amount" },
+    { key: "requisitionStatus" as keyof Requisition, label: "Status" },
+  ];
+
+  const renderCustomCell = (key: keyof Requisition, item: Requisition) => {
+    if (key === "requisitionStatus") {
+      return (
+        <span
+          className={`py-1 px-3 rounded-full text-xs font-semibold ${
+            item.requisitionStatus === "APPROVED"
+              ? "bg-green-100 text-green-800"
+              : item.requisitionStatus === "REJECTED"
+              ? "bg-red-100 text-red-800"
+              : item.requisitionStatus === "DRAFTS"
+              ? "bg-gray-100 text-gray-800"
+              : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {item.requisitionStatus === "APPROVED"
+            ? "Approved"
+            : item.requisitionStatus === "REJECTED"
+            ? "Rejected"
+            : item.requisitionStatus === "DRAFTS"
+            ? "Drafts"
+            : "Pending"}
+        </span>
+      );
+    }
+    return String(item[key]);
+  };
+
   return (
     <div className="flex h-screen">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
@@ -117,100 +136,51 @@ const ApprovalsPage: React.FC = () => {
 
         <main className="p-6 flex flex-col h-full">
           {loading ? (
-            <div className="flex items-center justify-center flex-grow">
-              <RingLoader color="#FE633D" size={60} />
-            </div>
+            <LoadingSpinner />
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
             <div className="flex-grow">
-              <table className="min-w-full bg-white shadow-lg rounded-lg text-center">
-                <thead>
-                  <tr>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Description
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Amount
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Status
-                    </th>
-                    <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {approvals.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} className="py-3 px-6 text-gray-600">
-                        No approvals pending. Check back later.
-                      </td>
-                    </tr>
-                  ) : (
-                    approvals.map((approval) => (
-                      <tr key={approval.id}>
-                        <td className="py-4 px-6 border-b">
-                          {approval.description}
-                        </td>
-                        <td className="py-4 px-6 border-b">
-                          {approval.amount}
-                        </td>
-                        <td className="py-4 px-6 border-b">
-                          {approval.requisitionStatus === "APPROVED" ? (
-                            <FontAwesomeIcon
-                              icon={faCheckCircleSolid}
-                              className="text-green-500"
-                            />
-                          ) : approval.requisitionStatus === "REJECTED" ? (
-                            <FontAwesomeIcon
-                              icon={faTimesCircleSolid}
-                              className="text-red-500"
-                            />
-                          ) : (
-                            <FontAwesomeIcon
-                              icon={faPauseCircleSolid}
-                              className="text-yellow-500"
-                            />
-                          )}
-                        </td>
-                        <td className="py-4 px-6 border-b">
-                          <button
-                            onClick={() => handleApprove(approval.id)}
-                            className="text-green-500 hover:text-green-700"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => handleReject(approval.id)}
-                            className="text-red-500 hover:text-red-700 ml-4"
-                          >
-                            Reject
-                          </button>
-                          <button
-                            onClick={() => handleStall(approval.id)}
-                            className="text-yellow-500 hover:text-yellow-700 ml-4"
-                          >
-                            Stall
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+              <Table
+                columns={columns}
+                data={approvals}
+                renderCustomCell={renderCustomCell}
+                renderRowActions={(approval) => (
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={() => handleApprove(approval.id)}
+                      className="flex items-center justify-center bg-green-100 text-green-800 hover:bg-green-300 border border-green-300 rounded-full px-2 py-1 text-sm transition-colors duration-200"
+                    >
+                      <FontAwesomeIcon icon={faCheckCircleSolid} />
+                      <span className="hidden sm:inline ml-1">Approve</span>
+                    </button>
+                    <button
+                      onClick={() => handleReject(approval.id)}
+                      className="flex items-center justify-center bg-red-100 text-red-800 hover:bg-red-300 border border-red-300 rounded-full px-2 py-1 text-sm ml-2 transition-colors duration-200"
+                    >
+                      <FontAwesomeIcon icon={faTimesCircleSolid} />
+                      <span className="hidden sm:inline ml-1">Reject</span>
+                    </button>
+                    <button
+                      onClick={() => handleStall(approval.id)}
+                      className="flex items-center justify-center bg-yellow-100 text-yellow-800 hover:bg-yellow-300 border border-yellow-300 rounded-full px-2 py-1 text-sm ml-2 transition-colors duration-200"
+                    >
+                      <FontAwesomeIcon icon={faPauseCircleSolid} />
+                      <span className="hidden sm:inline ml-1">Stall</span>
+                    </button>
+                  </div>
+                )}
+              />
             </div>
           )}
         </main>
-
-        <ToastContainer position="bottom-right" />
       </div>
       {showSessionExpiredDialog && (
         <SessionExpiredDialog
           onClose={() => setShowSessionExpiredDialog(false)}
         />
       )}
+      <ToastContainer />
     </div>
   );
 };
