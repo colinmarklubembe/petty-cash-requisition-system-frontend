@@ -23,7 +23,7 @@ const SettingsPage = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -54,12 +54,12 @@ const SettingsPage = () => {
       return;
     }
 
-    setIsSubmitting(true); // Set loading state to true
+    setIsSubmitting(true);
 
     try {
       const response = await settingsApi.updatePassword(userData);
       toast.success("Password changed successfully");
-      setOldPassword(""); // Clear input fields
+      setOldPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
       console.log(response);
@@ -70,7 +70,7 @@ const SettingsPage = () => {
       );
       console.error(error);
     } finally {
-      setIsSubmitting(false); // Reset loading state
+      setIsSubmitting(false);
     }
   };
 
@@ -83,7 +83,7 @@ const SettingsPage = () => {
     };
 
     checkSession();
-    const interval = setInterval(checkSession, 60000); // 1 minute
+    const interval = setInterval(checkSession, 60000);
 
     return () => clearInterval(interval);
   }, [navigate]);
@@ -95,9 +95,8 @@ const SettingsPage = () => {
     };
   }, []);
 
-  // Simulate a delay for loading
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000); // Simulate 2 seconds loading time
+    const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -160,13 +159,13 @@ const SettingsPage = () => {
           </div>
         </header>
 
-        <main className="mt-6 p-6">
+        <main className="mt-6 p-6 flex justify-center items-center">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <RingLoader color="#F05A28" size={60} />
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="w-full max-w-lg space-y-6">
               <Tab.Group>
                 <Tab.List className="bg-white p-4 rounded-lg shadow-md mb-6 flex space-x-4 border-b border-gray-200">
                   <Tab
@@ -205,7 +204,7 @@ const SettingsPage = () => {
                 </Tab.List>
 
                 <Tab.Panels>
-                  <Tab.Panel className="bg-white p-6 rounded-lg shadow-md">
+                  <Tab.Panel className="bg-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
                     <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
                       <FiUser className="mr-2" /> Profile Settings
                     </h2>
@@ -216,7 +215,7 @@ const SettingsPage = () => {
                         </label>
                         <input
                           type="text"
-                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE] transition-transform transform hover:scale-105"
                         />
                       </div>
                       <div>
@@ -225,30 +224,33 @@ const SettingsPage = () => {
                         </label>
                         <input
                           type="email"
-                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE] transition-transform transform hover:scale-105"
                         />
                       </div>
                       <button
                         type="submit"
-                        className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
+                        className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D] transition-transform transform hover:scale-105"
                       >
                         Update Profile
                       </button>
                     </form>
                   </Tab.Panel>
 
-                  <Tab.Panel className="bg-white p-6 rounded-lg shadow-md">
+                  <Tab.Panel className="bg-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
                     <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
                       <FiBell className="mr-2" /> Notification Settings
                     </h2>
                     {/* Notification settings form */}
                   </Tab.Panel>
 
-                  <Tab.Panel className="bg-white p-6 rounded-lg shadow-md">
+                  <Tab.Panel className="bg-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
                     <h2 className="text-xl font-semibold mb-4 text-[#202046] flex items-center">
-                      <FiLock className="mr-2" /> Change Password
+                      <FiLock className="mr-2" /> Account Security
                     </h2>
-                    <form className="space-y-4" onSubmit={handleChangePassword}>
+                    <form
+                      className="space-y-4"
+                      onSubmit={handleChangePassword}
+                    >
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
                           Old Password
@@ -257,7 +259,7 @@ const SettingsPage = () => {
                           type="password"
                           value={oldPassword}
                           onChange={(e) => setOldPassword(e.target.value)}
-                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE] transition-transform transform hover:scale-105"
                         />
                       </div>
                       <div>
@@ -268,7 +270,7 @@ const SettingsPage = () => {
                           type="password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE] transition-transform transform hover:scale-105"
                         />
                       </div>
                       <div>
@@ -281,25 +283,18 @@ const SettingsPage = () => {
                           onChange={(e) =>
                             setConfirmNewPassword(e.target.value)
                           }
-                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE]"
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#3886CE] focus:border-[#3886CE] transition-transform transform hover:scale-105"
                         />
                       </div>
                       <button
                         type="submit"
-                        disabled={isSubmitting} // Disable button when submitting
-                        className="relative bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D]"
+                        className="bg-[#FE633D] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#e45a32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FE633D] transition-transform transform hover:scale-105"
+                        disabled={isSubmitting}
                       >
-                        <span
-                          className={`${
-                            isSubmitting ? "opacity-0" : "opacity-100"
-                          } transition-opacity duration-300`}
-                        >
-                          Change Password
-                        </span>
-                        {isSubmitting && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <PulseLoader color="#ffffff" size={10} margin={4} />
-                          </div>
+                        {isSubmitting ? (
+                          <PulseLoader size={8} color="white" />
+                        ) : (
+                          "Change Password"
                         )}
                       </button>
                     </form>
