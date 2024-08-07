@@ -5,6 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileAlt, faMoneyBillWave } from "@fortawesome/free-solid-svg-icons";
 import { pettyCashApi } from "../../api";
+import { PettyFundFormInputs } from "../../types/PettyFund";
+import { PettyFund } from "../../types/PettyFund";
 
 export const pettyFundSchema = yup.object().shape({
   name: yup.string().required("Name is required"),
@@ -14,23 +16,16 @@ export const pettyFundSchema = yup.object().shape({
     .positive("Amount must be positive"),
 });
 
-export interface PettyFundFormInputs {
-  name: string;
-  amount: number;
-}
-
 interface EditPettyFundFormProps {
   onClose: () => void;
-  onEdit: (updatedPettyFund: PettyFundFormInputs) => void;
-  initialData: PettyFundFormInputs;
-  fundId: string;
+  onSubmit: (updatedPettyFund: PettyFundFormInputs) => void;
+  initialData: PettyFund;
 }
 
 const EditPettyFundForm: React.FC<EditPettyFundFormProps> = ({
   onClose,
-  onEdit,
+  onSubmit,
   initialData,
-  fundId,
 }) => {
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -42,22 +37,31 @@ const EditPettyFundForm: React.FC<EditPettyFundFormProps> = ({
     reset,
   } = useForm<PettyFundFormInputs>({
     resolver: yupResolver(pettyFundSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      name: initialData.name,
+      amount: initialData.currentBalance,
+    },
   });
 
   useEffect(() => {
-    reset(initialData);
+    reset({
+      name: initialData.name,
+      amount: initialData.currentBalance,
+    });
   }, [initialData, reset]);
 
-  const onSubmit: SubmitHandler<PettyFundFormInputs> = async (data) => {
+  const handleFormSubmit: SubmitHandler<PettyFundFormInputs> = async (data) => {
     setSubmitting(true);
     setToastMessage(null);
 
     try {
-      const response = await pettyCashApi.updatePettyCashFund(fundId, data);
+      const response = await pettyCashApi.updatePettyCashFund(
+        initialData.id,
+        data
+      );
       setToastMessage(response.message);
       console.log("Petty Fund Updated Successfully! ", response);
-      onEdit(data);
+      onSubmit(data);
       onClose();
     } catch (error: any) {
       const errorMessage =
@@ -80,7 +84,7 @@ const EditPettyFundForm: React.FC<EditPettyFundFormProps> = ({
           {toastMessage}
         </div>
       )}
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
         <div className="mb-4">
           <label className="block text-[#202046] text-sm font-medium">
             Name
