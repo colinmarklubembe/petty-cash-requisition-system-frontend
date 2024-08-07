@@ -1,18 +1,10 @@
 import React, { useState } from "react";
-import * as yup from "yup";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileAlt, faMoneyBillWave } from "@fortawesome/free-solid-svg-icons";
 import { pettyCashApi } from "../../api";
-
-export const pettyFundSchema = yup.object().shape({
-  name: yup.string().required("Name is required"),
-  amount: yup
-    .number()
-    .required("Amount is required")
-    .positive("Amount must be positive"),
-});
+import { fundSchema } from "../../validators";
 
 export interface PettyFundFormInputs {
   name: string;
@@ -36,7 +28,7 @@ const CreatePettyFundForm: React.FC<CreatePettyFundFormProps> = ({
     handleSubmit,
     formState: { errors },
   } = useForm<PettyFundFormInputs>({
-    resolver: yupResolver(pettyFundSchema),
+    resolver: yupResolver(fundSchema),
   });
 
   const onSubmit: SubmitHandler<PettyFundFormInputs> = async (data) => {

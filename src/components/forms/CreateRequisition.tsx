@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import * as yup from "yup";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,16 +8,7 @@ import {
   faComment,
 } from "@fortawesome/free-solid-svg-icons";
 import { requisitionApi, pettyCashApi } from "../../api";
-
-export const requisitionSchema = yup.object().shape({
-  title: yup.string().required("Title is required"),
-  description: yup.string().required("Description is required"),
-  amount: yup
-    .number()
-    .required("Amount is required")
-    .positive("Amount must be positive"),
-  pettyCashFundId: yup.string().required("Petty cash fund is required"),
-});
+import { requisitionSchema } from "../../validators";
 
 export interface RequisitionFormInputs {
   title: string;

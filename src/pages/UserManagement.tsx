@@ -1,15 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/ui/SideBar";
-import {
-  FiBell,
-  FiSettings,
-  FiUser,
-  FiMenu,
-  FiX,
-  FiMoreHorizontal,
-  FiEdit,
-  FiTrash,
-} from "react-icons/fi";
+import { FiMoreHorizontal, FiEdit, FiTrash } from "react-icons/fi";
 import { RingLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { isSessionExpired } from "../utils/session";
@@ -19,10 +10,10 @@ import InviteUser, {
   InviteUserFormInputs,
 } from "../components/forms/InviteUser";
 import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
+import Header from "../components/ui/Header";
 
 const UserManagementPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<UserCompany[]>([]);
@@ -30,13 +21,10 @@ const UserManagementPage = () => {
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
     useState(false);
-
   const navigate = useNavigate();
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   useEffect(() => {
     const checkSession = () => {
@@ -71,12 +59,6 @@ const UserManagementPage = () => {
   }, []);
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
-      setDropdownOpen(false);
-    }
     if (
       actionsRef.current &&
       !actionsRef.current.contains(event.target as Node)
@@ -135,56 +117,7 @@ const UserManagementPage = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
-          <h1 className="text-3xl font-bold text-white">User Management</h1>
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={toggleDropdown}
-              className="text-white hover:text-gray-200 focus:outline-none"
-              aria-label="Menu"
-              title="Menu"
-            >
-              {isDropdownOpen ? (
-                <FiX className="h-8 w-8" />
-              ) : (
-                <FiMenu className="h-8 w-8" />
-              )}
-            </button>
-            <div
-              className={`absolute top-full right-0 mt-2 bg-white text-black rounded-lg shadow-lg p-4 flex flex-col space-y-2 transition-transform transform ${
-                isDropdownOpen ? "scale-100 opacity-100" : "scale-75 opacity-0"
-              }`}
-            >
-              <button
-                type="button"
-                aria-label="Notifications"
-                title="Notifications"
-                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
-              >
-                <FiBell className="h-6 w-6" />
-                <span className="text-sm">Notifications</span>
-              </button>
-              <button
-                type="button"
-                aria-label="Settings"
-                title="Settings"
-                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
-              >
-                <FiSettings className="h-6 w-6" />
-                <span className="text-sm">Settings</span>
-              </button>
-              <button
-                type="button"
-                aria-label="User profile"
-                title="User profile"
-                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
-              >
-                <FiUser className="h-6 w-6" />
-                <span className="text-sm">Profile</span>
-              </button>
-            </div>
-          </div>
-        </header>
+        <Header pageTitle="User Management" />
 
         <main className="mt-6 p-6">
           <button

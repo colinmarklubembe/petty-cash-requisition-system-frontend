@@ -7,7 +7,6 @@ import {
   faEllipsisH,
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
-import { FiMenu, FiX, FiBell, FiSettings, FiUser } from "react-icons/fi";
 import Sidebar from "../components/ui/SideBar";
 import { transactionApi } from "../api";
 import { Transaction, TransactionFormInputs } from "../types/Transaction";
@@ -18,11 +17,11 @@ import { isSessionExpired } from "../utils/session";
 import TransactionDetailsView from "../components/views/Transaction";
 import Modal from "../components/ui/Modal";
 import SessionExpiredDialog from "../components/ui/SessionExpiredDialog";
+import Header from "../components/ui/Header";
 
 const TransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [activeTransactionId, setActiveTransactionId] = useState<string | null>(
     null
   );
@@ -35,8 +34,6 @@ const TransactionsPage: React.FC = () => {
   const navigate = useNavigate();
   const [showSessionExpiredDialog, setShowSessionExpiredDialog] =
     useState(false);
-
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -76,10 +73,6 @@ const TransactionsPage: React.FC = () => {
     setIsSidebarOpen((prev) => !prev);
   };
 
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
-
   const handleCreateTransaction = (newTransaction: TransactionFormInputs) => {
     const transaction: Transaction = {
       id: "",
@@ -96,27 +89,18 @@ const TransactionsPage: React.FC = () => {
 
   const handleEditTransaction = (id: string) => {
     // Logic to edit the transaction with the given id
-    setDropdownOpen(false);
   };
 
   const handleDeleteTransaction = (id: string) => {
     // Logic to delete the transaction with the given id
-    setDropdownOpen(false);
   };
 
   const handleViewTransaction = (id: string) => {
     const transaction = transactions.find((t) => t.id === id);
     setSelectedTransaction(transaction || null);
-    setDropdownOpen(false);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
-      setDropdownOpen(false);
-    }
     if (
       actionsRef.current &&
       !actionsRef.current.contains(event.target as Node)
@@ -140,56 +124,7 @@ const TransactionsPage: React.FC = () => {
           isSidebarOpen ? "ml-56" : "ml-12"
         }`}
       >
-        <header className="bg-gradient-to-r from-[#202046] to-[#FE633D] shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
-          <h1 className="text-3xl font-bold text-white">Transactions</h1>
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={toggleDropdown}
-              className="text-white hover:text-gray-200 focus:outline-none"
-              aria-label="Menu"
-              title="Menu"
-            >
-              {isDropdownOpen ? (
-                <FiX className="h-8 w-8" />
-              ) : (
-                <FiMenu className="h-8 w-8" />
-              )}
-            </button>
-            <div
-              className={`absolute top-full right-0 mt-2 bg-white text-black rounded-lg shadow-lg p-4 flex flex-col space-y-2 transition-transform transform ${
-                isDropdownOpen ? "scale-100 opacity-100" : "scale-75 opacity-0"
-              }`}
-            >
-              <button
-                type="button"
-                aria-label="Notifications"
-                title="Notifications"
-                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
-              >
-                <FiBell className="h-6 w-6" />
-                <span className="text-sm">Notifications</span>
-              </button>
-              <button
-                type="button"
-                aria-label="Settings"
-                title="Settings"
-                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
-              >
-                <FiSettings className="h-6 w-6" />
-                <span className="text-sm">Settings</span>
-              </button>
-              <button
-                type="button"
-                aria-label="User profile"
-                title="User profile"
-                className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
-              >
-                <FiUser className="h-6 w-6" />
-                <span className="text-sm">Profile</span>
-              </button>
-            </div>
-          </div>
-        </header>
+        <Header pageTitle="Transactions" />
 
         <main className="p-6 flex flex-col h-full">
           <button

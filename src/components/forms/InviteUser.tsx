@@ -1,18 +1,10 @@
-import * as yup from "yup";
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faUser } from "@fortawesome/free-solid-svg-icons";
 import { userApi } from "../../api";
-
-export const inviteUserSchema = yup.object().shape({
-  email: yup.string().email("Invalid email").required("Email is required"),
-  firstName: yup.string().required("First name is required"),
-  middleName: yup.string().optional(),
-  lastName: yup.string().required("Last name is required"),
-  role: yup.string().required("Role is required"),
-});
+import { inviteUserSchema } from "../../validators";
 
 export interface InviteUserFormInputs {
   email: string;
