@@ -39,7 +39,7 @@ const SessionExpiredDialog: React.FC<SessionExpiredDialogProps> = ({
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
       <div
         ref={dialogRef}
-        className="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg relative"
+        className="bg-white p-6 rounded-lg shadow-lg w-4/5 max-w-xl relative"
       >
         <button
           title="Close"

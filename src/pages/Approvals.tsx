@@ -172,7 +172,7 @@ const ApprovalsPage: React.FC = () => {
           )}
         </main>
       </div>
-      {showSessionExpiredDialog && (
+      {showSessionExpiredDialog === true && (
         <SessionExpiredDialog
           onClose={() => setShowSessionExpiredDialog(false)}
         />

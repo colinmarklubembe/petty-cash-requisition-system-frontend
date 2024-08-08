@@ -11,8 +11,8 @@ const useSessionCheck = () => {
     const checkSession = () => {
       if (isSessionExpired()) {
         setShowSessionExpiredDialog(true);
+        console.log("Session expired. Redirecting to login page.");
         localStorage.clear();
-        navigate("/login");
       }
     };
 
