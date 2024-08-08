@@ -14,23 +14,16 @@ const Table = <T,>({
   renderCustomCell,
 }: TableProps<T>) => {
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white shadow-lg rounded-lg text-center">
-        <thead>
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <table className="w-full text-sm text-center text-gray-500">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             {columns.map((column) => (
-              <th
-                key={String(column.key)}
-                className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600"
-              >
+              <th key={String(column.key)} className="px-6 py-3">
                 {column.label}
               </th>
             ))}
-            {renderRowActions && (
-              <th className="py-3 px-6 bg-gray-100 border-b text-sm uppercase font-semibold text-gray-600">
-                Actions
-              </th>
-            )}
+            {renderRowActions && <th className="px-6 py-3">Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -38,23 +31,23 @@ const Table = <T,>({
             <tr>
               <td
                 colSpan={columns.length + (renderRowActions ? 1 : 0)}
-                className="py-3 px-6 text-gray-600"
+                className="px-6 py-4"
               >
-                No data available. Check back later.
+                No data available.
               </td>
             </tr>
           ) : (
             data.map((item, index) => (
-              <tr key={index}>
+              <tr key={index} className="bg-white border-b hover:bg-gray-50">
                 {columns.map((column) => (
-                  <td key={String(column.key)} className="py-4 px-6 border-b">
+                  <td key={String(column.key)} className="px-6 py-4">
                     {renderCustomCell
                       ? renderCustomCell(column.key, item)
                       : String(item[column.key])}
                   </td>
                 ))}
                 {renderRowActions && (
-                  <td className="py-4 px-6 border-b flex justify-center items-center">
+                  <td className="px-6 py-4 flex justify-center items-center">
                     {renderRowActions(item)}
                   </td>
                 )}
