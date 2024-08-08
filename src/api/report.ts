@@ -7,40 +7,48 @@ class ReportApi {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
 
-    const url = new URL(`${API_URL}/user/${userId}`);
+    try {
+      const url = new URL(`${API_URL}/user/${userId}`);
 
-    if (selectedDate) {
-      url.searchParams.append("selectedDate", selectedDate);
+      if (selectedDate) {
+        url.searchParams.append("selectedDate", selectedDate);
+      }
+
+      const response = await axios.get(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw error;
     }
-
-    const response = await axios.get(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
-
-    return response.data;
   }
 
   async getCompanyReport(selectedDate?: string) {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
 
-    const url = new URL(`${API_URL}/company`);
+    try {
+      const url = new URL(`${API_URL}/company`);
 
-    if (selectedDate) {
-      url.searchParams.append("selectedDate", selectedDate);
+      if (selectedDate) {
+        url.searchParams.append("selectedDate", selectedDate);
+      }
+
+      const response = await axios.get(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw error;
     }
-
-    const response = await axios.get(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
-
-    return response.data;
   }
 }
 

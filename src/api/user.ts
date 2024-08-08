@@ -28,27 +28,35 @@ class UserApi {
   getUsers = async () => {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
-    const response = await axios.get(`${API_URL}/get-users`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
+    try {
+      const response = await axios.get(`${API_URL}/get-users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   getCompanyUsers = async () => {
     const companyId = localStorage.getItem("companyId");
     const token = localStorage.getItem("token");
-    const response = await axios.get(`${API_URL}/get-company-users`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
+    try {
+      const response = await axios.get(`${API_URL}/get-company-users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 }
 

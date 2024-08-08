@@ -6,49 +6,74 @@ class PettyCashApi {
   getPettyCashFunds = async () => {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
-    const response = await axios.get(`${API_URL}/get-all`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
+    try {
+      const response = await axios.get(`${API_URL}/get-all`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   createPettyCashFund = async (data: any) => {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
-    const response = await axios.post(`${API_URL}/create`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
+    try {
+      const response = await axios.post(`${API_URL}/create`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   updatePettyCashFund = async (fundId: string, data: any) => {
-    const response = await axios.put(`${API_URL}/update/${fundId}`, data, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    try {
+      const response = await axios.put(`${API_URL}/update/${fundId}`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   deletePettyCashFund = async (id: string) => {
-    const response = await axios.delete(`${API_URL}/delete/${id}`);
+    try {
+      const response = await axios.delete(`${API_URL}/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "company-id": `${localStorage.getItem("companyId")}`,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   getPettyCashFundById = async (id: string) => {
-    const response = await axios.get(`${API_URL}/fund/${id}`);
+    try {
+      const response = await axios.get(`${API_URL}/fund/${id}`);
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 }
 

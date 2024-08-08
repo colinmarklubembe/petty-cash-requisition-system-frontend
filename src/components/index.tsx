@@ -14,6 +14,7 @@ export { default as ActionsMenu } from "./ui/ActionsMenu";
 export { default as LoadingSpinner } from "./ui/LoadingSpinner";
 export { default as DownloadButton } from "./ui/DownloadReport";
 export { default as SessionExpiredDialog } from "./ui/SessionExpiredDialog";
+export { default as ConfirmDeleteDialog } from "./ui/ConfirmDelete";
 // forms
 export { default as CreateCompany } from "./forms/CreateCompany";
 export { default as CreateTransaction } from "./forms/CreateTransaction";

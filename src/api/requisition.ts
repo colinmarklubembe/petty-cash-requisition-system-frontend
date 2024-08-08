@@ -6,53 +6,69 @@ class RequisitionService {
   createRequisition = async (data: any) => {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
-    const response = await axios.post(`${API_URL}/create`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
-    return response.data;
+    try {
+      const response = await axios.post(`${API_URL}/create`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   getUserRequisitions = async () => {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
-    const response = await axios.get(`${API_URL}/user-requisitions`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
+    try {
+      const response = await axios.get(`${API_URL}/user-requisitions`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   getAllRequisitions = async () => {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
-    const response = await axios.get(`${API_URL}/all`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "company-id": `${companyId}`,
-      },
-    });
+    try {
+      const response = await axios.get(`${API_URL}/all`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   getRequisitionById = async (requisitionId: string) => {
     const token = localStorage.getItem("token");
-    const response = await axios.get(
-      `${API_URL}/get-requisition/${requisitionId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    try {
+      const response = await axios.get(
+        `${API_URL}/get-requisition/${requisitionId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   };
 }
 

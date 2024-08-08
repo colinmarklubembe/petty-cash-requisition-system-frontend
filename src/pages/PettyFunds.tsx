@@ -2,6 +2,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { pettyCashApi } from "../api";
 import { useSessionCheck } from "../hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ToastContainer, toast } from "react-toastify";
 import { PettyFund, PettyFundFormInputs } from "../types/PettyFund";
 import React, { useState, useEffect, useCallback } from "react";
 import {
@@ -14,6 +15,7 @@ import {
   EditPettyFundForm,
   PettyFundDetailView,
   CreatePettyFundForm,
+  ConfirmDeleteDialog,
   SessionExpiredDialog,
 } from "../components";
 
@@ -29,6 +31,8 @@ const PettyFundsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
     useSessionCheck();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [fundToDelete, setFundToDelete] = useState<string | null>(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -65,7 +69,32 @@ const PettyFundsPage: React.FC = () => {
     fetchPettyCashFunds();
   };
 
-  const handleDeleteFund = (id: string) => {};
+  const handleDeleteFund = (id: string) => {
+    setFundToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (fundToDelete) {
+      try {
+        const response = await pettyCashApi.deletePettyCashFund(fundToDelete);
+        setFunds((prevFunds) =>
+          prevFunds.filter((fund) => fund.id !== fundToDelete)
+        );
+        console.log("Fund deleted: ", response.message);
+        toast.success(response.message);
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.error || "Failed to delete fund.";
+        toast.error(errorMessage);
+        console.error("Error: ", error);
+      } finally {
+        setFundToDelete(null);
+        setShowDeleteDialog(false);
+        fetchPettyCashFunds();
+      }
+    }
+  };
 
   const handleViewFund = (id: string) => {
     const fund = funds.find((fund) => fund.id === id);
@@ -191,6 +220,14 @@ const PettyFundsPage: React.FC = () => {
           />
         </Modal>
       )}
+      {showDeleteDialog && (
+        <ConfirmDeleteDialog
+          onClose={() => setShowDeleteDialog(false)}
+          onConfirmDelete={handleConfirmDelete}
+          itemName="this petty fund"
+        />
+      )}
+      <ToastContainer />
     </div>
   );
 };
