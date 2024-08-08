@@ -107,8 +107,8 @@ const PettyFundsPage: React.FC = () => {
       key: "currentBalance" as keyof PettyFund,
       label: "Current Balance (Ugx)",
     },
-    { key: "totalAdded" as keyof PettyFund, label: "Total Added" },
-    { key: "totalSpent" as keyof PettyFund, label: "Total Spent" },
+    { key: "totalAdded" as keyof PettyFund, label: "Total Added (Ugx)" },
+    { key: "totalSpent" as keyof PettyFund, label: "Total Spent (Ugx)" },
   ];
 
   const renderRowActions = (fund: PettyFund) => (

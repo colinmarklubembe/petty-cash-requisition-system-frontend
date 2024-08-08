@@ -84,7 +84,7 @@ const RequisitionsPage: React.FC = () => {
 
   const columns = [
     { key: "title" as keyof Requisition, label: "Title" },
-    { key: "amount" as keyof Requisition, label: "Amount" },
+    { key: "amount" as keyof Requisition, label: "Amount (Ugx)" },
     { key: "requisitionStatus" as keyof Requisition, label: "Status" },
     { key: "pettyCashFund" as keyof Requisition, label: "Fund" },
   ];

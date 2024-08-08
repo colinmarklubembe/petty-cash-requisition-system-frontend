@@ -90,7 +90,7 @@ const ApprovalsPage: React.FC = () => {
 
   const columns = [
     { key: "description" as keyof Requisition, label: "Description" },
-    { key: "amount" as keyof Requisition, label: "Amount" },
+    { key: "amount" as keyof Requisition, label: "Amount (Ugx)" },
     { key: "requisitionStatus" as keyof Requisition, label: "Status" },
   ];
 

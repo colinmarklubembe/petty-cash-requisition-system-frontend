@@ -99,7 +99,7 @@ const TransactionsPage: React.FC = () => {
 
   const columns = [
     { key: "type" as keyof Transaction, label: "Type" },
-    { key: "amount" as keyof Transaction, label: "Amount" },
+    { key: "amount" as keyof Transaction, label: "Amount (Ugx)" },
     { key: "pettyCashFund.name" as keyof Transaction, label: "Fund" },
     { key: "requisition.title" as keyof Transaction, label: "Requisition" },
     { key: "actions" as keyof Transaction, label: "Actions" },
@@ -111,13 +111,15 @@ const TransactionsPage: React.FC = () => {
   ) => {
     if (key === "actions") {
       return (
-        <ActionsMenu
-          onView={() => handleViewTransaction(item.id)}
-          onEdit={() => handleEditTransaction(item.id)}
-          onDelete={() => handleDeleteTransaction(item.id)}
-          isOpen={activeTransactionId === item.id}
-          closeMenu={() => setActiveTransactionId(null)}
-        />
+        <div className="flex justify-center items-center">
+          <ActionsMenu
+            onView={() => handleViewTransaction(item.id)}
+            onEdit={() => handleEditTransaction(item.id)}
+            onDelete={() => handleDeleteTransaction(item.id)}
+            isOpen={activeTransactionId === item.id}
+            closeMenu={() => setActiveTransactionId(null)}
+          />
+        </div>
       );
     }
     if (key === "pettyCashFund.name") {
