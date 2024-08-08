@@ -39,7 +39,10 @@ const Login = () => {
       localStorage.setItem("token", response.token);
       localStorage.setItem("expirationTime", expirationTime.toString());
 
-      navigate("/companies");
+      // Navigate after a slight delay to ensure everything is set
+      setTimeout(() => {
+        navigate("/companies");
+      }, 1000);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error || "Login failed. Please try again.";
@@ -102,7 +105,7 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-900 text-white py-3 rounded-full hover:bg-blue-800 transition-colors text-lg font-semibold flex items-center justify-center"
+            className="w-full bg-[#202046] text-white py-3 rounded-full hover:bg-blue-800 transition-colors text-lg font-semibold flex items-center justify-center"
             disabled={submitting}
           >
             {submitting ? (
