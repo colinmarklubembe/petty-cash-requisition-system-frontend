@@ -30,3 +30,4 @@ export { default as RequisitionDetailsView } from "./views/Requisition";
 export { default as PettyFundDetailView } from "./views/PettyFund";
 export { default as CompanyReportView } from "./views/CompanyReportView";
 export { default as UserReportView } from "./views/UserReportView";
+export { default as UserDetailView } from "./views/UserDetailView";

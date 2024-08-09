@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ToastContainer, toast } from "react-toastify";
 import {
   faFileAlt,
   faMoneyBillWave,
@@ -27,7 +28,6 @@ const CreateRequisition: React.FC<CreateRequisitionProps> = ({
   onCreate,
 }) => {
   const [submitting, setSubmitting] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [pettyCashFunds, setPettyCashFunds] = useState<any[]>([]);
 
   const {
@@ -53,18 +53,17 @@ const CreateRequisition: React.FC<CreateRequisitionProps> = ({
 
   const onSubmit: SubmitHandler<RequisitionFormInputs> = async (data) => {
     setSubmitting(true);
-    setToastMessage(null);
 
     try {
       const response = await requisitionApi.createRequisition(data);
-      setToastMessage(response.message);
+      toast.success(response.message);
       onCreate(data);
       onClose();
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error ||
         "Failed to create requisition! Please try again.";
-      setToastMessage(errorMessage);
+      toast.error(errorMessage);
       console.error("Error: ", error);
     } finally {
       setSubmitting(false);
@@ -76,11 +75,6 @@ const CreateRequisition: React.FC<CreateRequisitionProps> = ({
       <h2 className="text-2xl font-bold mb-4 text-center text-[#202046]">
         Create Requisition
       </h2>
-      {toastMessage && (
-        <div className="mb-4 p-3 rounded bg-[#FEE5E0] text-[#F05A28]">
-          {toastMessage}
-        </div>
-      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">
           <label className="block text-[#202046] text-sm font-medium">
@@ -172,6 +166,7 @@ const CreateRequisition: React.FC<CreateRequisitionProps> = ({
           {submitting ? "Creating..." : "Create Requisition"}
         </button>
       </form>
+      <ToastContainer />
     </div>
   );
 };

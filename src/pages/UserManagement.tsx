@@ -1,8 +1,9 @@
-import { userApi } from "../api";
+import { companyApi, userApi } from "../api";
 import { UserCompany } from "../types/User";
 import { useSessionCheck } from "../hooks";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { InviteUserFormInputs } from "../components/forms/InviteUser";
+import { ToastContainer, toast } from "react-toastify";
 import {
   Table,
   Header,
@@ -10,7 +11,10 @@ import {
   InviteUser,
   ActionsMenu,
   LoadingSpinner,
+  UserDetailView,
+  ConfirmDeleteDialog,
   SessionExpiredDialog,
+  Modal,
 } from "../components";
 
 const UserManagementPage = () => {
@@ -19,7 +23,10 @@ const UserManagementPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<UserCompany[]>([]);
   const [showInviteUserModal, setShowInviteUserModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserCompany | null>(null);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
+  const [userToRemove, setUserToRemove] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
     useSessionCheck();
 
@@ -29,22 +36,22 @@ const UserManagementPage = () => {
     { key: "role" as keyof UserCompany, label: "Role" },
   ];
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await userApi.getCompanyUsers();
-        setUsers(response.data);
-      } catch (err) {
-        setError("Failed to load users. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await userApi.getCompanyUsers();
+      setUsers(response.data);
+    } catch (err) {
+      setError("Failed to load users. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleInviteUser = async (newUserInput: InviteUserFormInputs) => {
     try {
@@ -69,23 +76,42 @@ const UserManagementPage = () => {
     }
   };
 
-  const handleEditUser = (userId: string) => {
-    alert(`Edit user functionality for user ID ${userId} to be implemented.`);
+  const handleViewUser = (userId: string) => {
+    const user = users.find((user) => user.user.id === userId);
+    setSelectedUser(user || null);
   };
 
   const handleDeleteUser = (userId: string) => {
-    alert(`Delete user functionality for user ID ${userId} to be implemented.`);
+    setUserToRemove(userId);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (userToRemove) {
+      try {
+        const response = await companyApi.removeUserFromCompany(userToRemove);
+        setUsers((prevUsers) =>
+          prevUsers.filter((user) => user.user.id !== userToRemove)
+        );
+        console.log("User removed from company: ", response.message);
+        toast.success(response.message);
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.error || "Failed to remove user.";
+        toast.error(errorMessage);
+        console.error("Error: ", error);
+      } finally {
+        setUserToRemove(null);
+        setShowDeleteDialog(false);
+        fetchUsers();
+      }
+    }
   };
 
   const renderRowActions = (user: UserCompany) => (
     <ActionsMenu
-      onEdit={() => handleEditUser(user.user.id)}
       onDelete={() => handleDeleteUser(user.user.id)}
-      onView={() =>
-        alert(
-          `View user functionality for user ID ${user.user.id} to be implemented.`
-        )
-      }
+      onView={() => handleViewUser(user.user.id)}
       isOpen={activeUserId === user.user.id}
       closeMenu={() => setActiveUserId(null)}
     />
@@ -164,6 +190,11 @@ const UserManagementPage = () => {
               }}
             />
           )}
+          {selectedUser && (
+            <Modal isVisible={true} onClose={() => setSelectedUser(null)}>
+              <UserDetailView userCompany={selectedUser} />
+            </Modal>
+          )}
         </main>
       </div>
       {showSessionExpiredDialog && (
@@ -171,6 +202,14 @@ const UserManagementPage = () => {
           onClose={() => setShowSessionExpiredDialog(false)}
         />
       )}
+      {showDeleteDialog && (
+        <ConfirmDeleteDialog
+          onClose={() => setShowDeleteDialog(false)}
+          onConfirmDelete={handleConfirmDelete}
+          itemName="this user"
+        />
+      )}
+      <ToastContainer />
     </div>
   );
 };

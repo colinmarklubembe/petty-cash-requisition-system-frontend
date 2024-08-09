@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ToastContainer, toast } from "react-toastify";
 import { faMoneyBillWave } from "@fortawesome/free-solid-svg-icons";
 import { transactionApi, requisitionApi } from "../../api";
 import { transactionSchema } from "../../validators";
@@ -22,7 +23,6 @@ const CreateTransaction: React.FC<CreateTransactionProps> = ({
   onCreate,
 }) => {
   const [submitting, setSubmitting] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [requisitions, setRequisitions] = useState<any[]>([]);
 
   const {
@@ -48,18 +48,17 @@ const CreateTransaction: React.FC<CreateTransactionProps> = ({
 
   const onSubmit: SubmitHandler<TransactionFormInputs> = async (data) => {
     setSubmitting(true);
-    setToastMessage(null);
 
     try {
       const response = await transactionApi.createTransaction(data);
-      setToastMessage(response.message);
+      toast.success(response.message);
       onCreate(data);
       onClose();
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error ||
         "Failed to create transaction! Please try again.";
-      setToastMessage(errorMessage);
+      toast.error(errorMessage);
       console.error("Error: ", error);
     } finally {
       setSubmitting(false);
@@ -71,11 +70,6 @@ const CreateTransaction: React.FC<CreateTransactionProps> = ({
       <h2 className="text-2xl font-bold mb-4 text-center text-[#202046]">
         Create Transaction
       </h2>
-      {toastMessage && (
-        <div className="mb-4 p-3 rounded bg-[#FEE5E0] text-[#F05A28]">
-          {toastMessage}
-        </div>
-      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">
           <label className="block text-[#202046] text-sm font-medium">
@@ -153,6 +147,7 @@ const CreateTransaction: React.FC<CreateTransactionProps> = ({
           {submitting ? "Creating..." : "Create Transaction"}
         </button>
       </form>
+      <ToastContainer />
     </div>
   );
 };

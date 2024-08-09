@@ -6,6 +6,7 @@ export interface User {
   middleName: string | undefined;
   lastName: string;
   email: string;
+  phoneNumber?: string | undefined;
   userCompanies: Company[] | undefined;
 }
 

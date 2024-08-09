@@ -49,6 +49,24 @@ class CompanyApi {
       throw error;
     }
   };
+
+  removeUserFromCompany = async (userId: string) => {
+    try {
+      const response = await axios.delete(
+        `${API_URL}/company/remove-user/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "company-id": localStorage.getItem("companyId"),
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  };
 }
 
 const companyApi = new CompanyApi();

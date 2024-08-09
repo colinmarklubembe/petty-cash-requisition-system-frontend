@@ -58,6 +58,21 @@ class UserApi {
       throw error;
     }
   };
+
+  getUserById = async (userId: string) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(`${API_URL}/get-user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  };
 }
 
 const userApi = new UserApi();
