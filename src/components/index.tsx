@@ -21,6 +21,7 @@ export { default as CreateTransaction } from "./forms/CreateTransaction";
 export { default as CreateRequisition } from "./forms/CreateRequisition";
 export { default as CreatePettyFundForm } from "./forms/CreatePettyFundForm";
 export { default as EditPettyFundForm } from "./forms/EditPettyFund";
+export { default as EditRequisitionForm } from "./forms/EditRequisition";
 export { default as EditCompany } from "./forms/EditCompany";
 export { default as InviteUser } from "./forms/InviteUser";
 // views

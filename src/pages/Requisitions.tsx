@@ -2,6 +2,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { requisitionApi } from "../api";
 import { useSessionCheck } from "../hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ToastContainer, toast } from "react-toastify";
 import { Requisition, RequisitionFormInputs } from "../types/Requisition";
 import React, { useState, useCallback, useEffect } from "react";
 import {
@@ -12,6 +13,8 @@ import {
   ActionsMenu,
   LoadingSpinner,
   CreateRequisition,
+  ConfirmDeleteDialog,
+  EditRequisitionForm,
   SessionExpiredDialog,
   RequisitionDetailsView,
 } from "../components";
@@ -26,8 +29,16 @@ const RequisitionsPage: React.FC = () => {
     useState(false);
   const [selectedRequisition, setSelectedRequisition] =
     useState<Requisition | null>(null);
+  const [editRequisitionData, setEditRequisitionData] =
+    useState<Requisition | null>(null);
+  const [showEditRequisitionModal, setShowEditRequisitionModal] =
+    useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [requisitionToDelete, setRequisitionToDelete] = useState<string | null>(
+    null
+  );
   const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
     useSessionCheck();
 
@@ -46,16 +57,62 @@ const RequisitionsPage: React.FC = () => {
 
     setRequisitions((prev) => [...prev, requisition]);
     setShowCreateRequisitionModal(false);
+    fetchRequisitions();
   };
 
   const handleEditRequisition = (id: string) => {
-    // Implement edit functionality if needed
-    setActiveRequisitionId(null);
+    const requisition = requisitions.find(
+      (requisition) => requisition.id === id
+    );
+
+    if (requisition) {
+      setEditRequisitionData(requisition);
+      setShowEditRequisitionModal(true);
+    }
+  };
+
+  const handleUpdateRequisition = (
+    updatedRequisition: RequisitionFormInputs
+  ) => {
+    setRequisitions((prevRequisitions) =>
+      prevRequisitions.map((requisition) =>
+        requisition.id === editRequisitionData?.id
+          ? { ...requisition, ...updatedRequisition }
+          : requisition
+      )
+    );
+
+    fetchRequisitions();
   };
 
   const handleDeleteRequisition = (id: string) => {
-    // Implement delete functionality if needed
-    setActiveRequisitionId(null);
+    setRequisitionToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (requisitionToDelete) {
+      try {
+        const response = await requisitionApi.deleteRequisition(
+          requisitionToDelete
+        );
+        setRequisitions((prevRequisitions) =>
+          prevRequisitions.filter(
+            (requisition) => requisition.id !== requisitionToDelete
+          )
+        );
+        console.log("Fund deleted: ", response.message);
+        toast.success(response.message);
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.error || "Failed to delete fund.";
+        toast.error(errorMessage);
+        console.error("Error: ", error);
+      } finally {
+        setRequisitionToDelete(null);
+        setShowDeleteDialog(false);
+      }
+    }
   };
 
   const handleViewRequisition = (id: string) => {
@@ -184,6 +241,29 @@ const RequisitionsPage: React.FC = () => {
           onClose={() => setShowSessionExpiredDialog(false)}
         />
       )}
+      {showEditRequisitionModal && editRequisitionData && (
+        <Modal
+          isVisible={true}
+          onClose={() => setShowEditRequisitionModal(false)}
+        >
+          <EditRequisitionForm
+            initialData={editRequisitionData}
+            onSubmit={(updatedRequisition) => {
+              handleUpdateRequisition(updatedRequisition);
+              setShowEditRequisitionModal(false);
+            }}
+            onClose={() => setShowEditRequisitionModal(false)}
+          />
+        </Modal>
+      )}
+      {showDeleteDialog && (
+        <ConfirmDeleteDialog
+          onClose={() => setShowDeleteDialog(false)}
+          onConfirmDelete={handleConfirmDelete}
+          itemName="this requisition"
+        />
+      )}
+      <ToastContainer />
     </div>
   );
 };

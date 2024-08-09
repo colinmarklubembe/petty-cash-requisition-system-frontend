@@ -5,10 +5,16 @@ import { useSessionCheck } from "../hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CompanyFormInputs } from "../components/forms/CreateCompany";
 import { Company, CompanyResponse } from "../types/Company";
-import { useState, useEffect, useRef } from "react";
-import { SessionExpiredDialog, CreateCompany } from "../components";
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  CreateCompany,
+  LoadingSpinner,
+  SessionExpiredDialog,
+} from "../components";
 
 const CompaniesPage = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [companiesWithRoles, setCompaniesWithRoles] = useState<
     { company: Company; role: string }[]
@@ -33,24 +39,32 @@ const CompaniesPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const companiesData: CompanyResponse = await companyApi.getCompanies();
-        const companiesWithRoles = companiesData.data.companies.map(
-          (companyData) => ({
-            company: companyData.company,
-            role: companyData.role,
-          })
-        );
-        setCompaniesWithRoles(companiesWithRoles);
-      } catch (error) {
-        console.error("Error fetching companies:", error);
-      }
-    };
+  const fetchCompanies = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const companiesData: CompanyResponse = await companyApi.getCompanies();
+      const companiesWithRoles = companiesData.data.companies.map(
+        (companyData) => ({
+          company: companyData.company,
+          role: companyData.role,
+        })
+      );
+      setCompaniesWithRoles(companiesWithRoles);
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error ||
+        "Failed to fetch approvals. Please try again.";
+      setError(errorMessage);
+      console.error("Error fetching companies:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchCompanies();
-  }, [companies]);
+  }, [fetchCompanies, companies]);
 
   const handleCreateCompany = (newCompanyInput: CompanyFormInputs) => {
     const newCompany: Company = {
@@ -71,7 +85,10 @@ const CompaniesPage = () => {
   const handleCompanyClick = (companyId: string, role: string) => {
     localStorage.setItem("companyId", companyId);
     localStorage.setItem("userRole", role);
-    navigate("/dashboard");
+
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 1000);
   };
 
   return (
@@ -87,10 +104,10 @@ const CompaniesPage = () => {
             Company
           </button>
         </div>
-        {companiesWithRoles.length === 0 ? (
-          <p className="text-gray-600">
-            No companies found. Create a new company to get started.
-          </p>
+        {loading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
         ) : (
           <div
             className={`grid gap-8 ${

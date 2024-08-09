@@ -19,6 +19,25 @@ class RequisitionService {
     }
   };
 
+  updateRequisition = async (requisitionId: string, data: any) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.put(
+        `${API_URL}/update/${requisitionId}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
   getUserRequisitions = async () => {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("companyId");
@@ -61,6 +80,24 @@ class RequisitionService {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
+  deleteRequisition = async (requisitionId: string) => {
+    try {
+      const response = await axios.delete(
+        `${API_URL}/delete-requisition/${requisitionId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "company-id": `${localStorage.getItem("companyId")}`,
           },
         }
       );
