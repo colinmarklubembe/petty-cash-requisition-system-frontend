@@ -68,14 +68,6 @@ const TransactionsPage: React.FC = () => {
     setShowCreateTransactionModal(false);
   };
 
-  const handleEditTransaction = (id: string) => {
-    // Logic to edit the transaction with the given id
-  };
-
-  const handleDeleteTransaction = (id: string) => {
-    // Logic to delete the transaction with the given id
-  };
-
   const handleViewTransaction = (id: string) => {
     const transaction = transactions.find((t) => t.id === id);
     setSelectedTransaction(transaction || null);
@@ -114,8 +106,6 @@ const TransactionsPage: React.FC = () => {
         <div className="flex justify-center items-center">
           <ActionsMenu
             onView={() => handleViewTransaction(item.id)}
-            onEdit={() => handleEditTransaction(item.id)}
-            onDelete={() => handleDeleteTransaction(item.id)}
             isOpen={activeTransactionId === item.id}
             closeMenu={() => setActiveTransactionId(null)}
           />
