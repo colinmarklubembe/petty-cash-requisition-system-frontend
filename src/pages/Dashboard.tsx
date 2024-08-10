@@ -85,6 +85,28 @@ const Dashboard = () => {
     ],
   };
 
+  const chartOptions = {
+    animation: {
+      duration: 2000,
+      easing: "easeInOutQuad" as const,
+      animateRotate: true,
+      animateScale: true,
+    },
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top" as const,
+      },
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            return `${tooltipItem.label}: ${tooltipItem.raw}`;
+          },
+        },
+      },
+    },
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
@@ -160,14 +182,14 @@ const Dashboard = () => {
                     <FiDollarSign className="mr-2 text-[#FE633D]" /> Fund
                     Balance
                   </h3>
-                  <Doughnut data={fundBalanceData} />
+                  <Doughnut data={fundBalanceData} options={chartOptions} />
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                   <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
                     <FiTrendingUp className="mr-2 text-[#FE633D]" /> Spending by
                     Fund
                   </h3>
-                  <Bar data={spendingByFundData} />
+                  <Bar data={spendingByFundData} options={chartOptions} />
                 </div>
               </div>
             </div>
