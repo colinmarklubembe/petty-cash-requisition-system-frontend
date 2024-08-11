@@ -15,10 +15,11 @@ import {
 import {
   Header,
   Sidebar,
+  StatCard,
+  ChartCard,
   LoadingSpinner,
   SessionExpiredDialog,
 } from "../components";
-
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,6 @@ const Dashboard = () => {
       setError(null);
       try {
         const response = await dashboardApi.getAdminDashboardData();
-        console.log(response.data.dashboardData);
         setDashboardData(response.data.dashboardData);
       } catch (err: any) {
         setError("Failed to load dashboard data. Please try again.");
@@ -58,12 +58,12 @@ const Dashboard = () => {
 
   // Data for charts
   const fundBalanceData = {
-    labels: dashboardData?.companyFunds.map((fund: any) => fund.name),
+    labels: dashboardData?.companyFunds.map((fund: any) => fund.name) || [],
     datasets: [
       {
-        data: dashboardData?.companyFunds.map(
-          (fund: any) => fund.currentBalance
-        ),
+        data:
+          dashboardData?.companyFunds.map((fund: any) => fund.currentBalance) ||
+          [],
         backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384", "#4BC0C0"],
         borderColor: ["#36A2EB", "#FFCE56", "#FF6384", "#4BC0C0"],
         borderWidth: 1,
@@ -72,11 +72,13 @@ const Dashboard = () => {
   };
 
   const spendingByFundData = {
-    labels: dashboardData?.spendingByFund.map((fund: any) => fund.fund),
+    labels: dashboardData?.spendingByFund.map((fund: any) => fund.fund) || [],
     datasets: [
       {
         label: "Spending by Fund",
-        data: dashboardData?.spendingByFund.map((fund: any) => fund.totalSpent),
+        data:
+          dashboardData?.spendingByFund.map((fund: any) => fund.totalSpent) ||
+          [],
         backgroundColor: "#FF6384",
         borderColor: "#FF6384",
         borderWidth: 2,
@@ -125,72 +127,55 @@ const Dashboard = () => {
           ) : (
             <div>
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
-                <div className="bg-white p-5 rounded-lg shadow-md flex items-center">
-                  <FiUsers className="text-2xl text-[#FE633D] mr-2" />
-                  <div>
-                    <h4 className="text-gray-500 text-sm">Total Users</h4>
-                    <h3 className="text-lg font-semibold text-[#202046]">
-                      {totalUsers}
-                    </h3>
-                  </div>
-                </div>
-                <div className="bg-white p-5 rounded-lg shadow-md flex items-center">
-                  <FiFolder className="text-2xl text-[#FE633D] mr-2" />
-                  <div>
-                    <h4 className="text-gray-500 text-sm">Total Funds</h4>
-                    <h3 className="text-lg font-semibold text-[#202046]">
-                      {totalFunds}
-                    </h3>
-                  </div>
-                </div>
-                <div className="bg-white p-5 rounded-lg shadow-md flex items-center">
-                  <FiTrendingUp className="text-2xl text-[#FE633D] mr-2" />
-                  <div>
-                    <h4 className="text-gray-500 text-sm">Active Funds</h4>
-                    <h3 className="text-lg font-semibold text-[#202046]">
-                      {activeFunds}
-                    </h3>
-                  </div>
-                </div>
-                <div className="bg-white p-5 rounded-lg shadow-md flex items-center">
-                  <FiClipboard className="text-2xl text-[#FE633D] mr-2" />
-                  <div>
-                    <h4 className="text-gray-500 text-sm">
-                      Monthly Requisitions
-                    </h4>
-                    <h3 className="text-lg font-semibold text-[#202046]">
-                      {monthlyRequisitions}
-                    </h3>
-                  </div>
-                </div>
-                <div className="bg-white p-5 rounded-lg shadow-md flex items-center">
-                  <FiFile className="text-2xl text-[#FE633D] mr-2" />
-                  <div>
-                    <h4 className="text-gray-500 text-sm">
-                      Monthly Transactions
-                    </h4>
-                    <h3 className="text-lg font-semibold text-[#202046]">
-                      {monthlyTransactions}
-                    </h3>
-                  </div>
-                </div>
+                <StatCard
+                  icon={FiUsers}
+                  label="Total Users"
+                  value={totalUsers}
+                  iconColor="text-[#FE633D]"
+                />
+                <StatCard
+                  icon={FiFolder}
+                  label="Total Funds"
+                  value={totalFunds}
+                  iconColor="text-[#FE633D]"
+                />
+                <StatCard
+                  icon={FiTrendingUp}
+                  label="Active Funds"
+                  value={activeFunds}
+                  iconColor="text-[#FE633D]"
+                />
+                <StatCard
+                  icon={FiClipboard}
+                  label="Monthly Requisitions"
+                  value={monthlyRequisitions}
+                  iconColor="text-[#FE633D]"
+                />
+                <StatCard
+                  icon={FiFile}
+                  label="Monthly Transactions"
+                  value={monthlyTransactions}
+                  iconColor="text-[#FE633D]"
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                  <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
-                    <FiDollarSign className="mr-2 text-[#FE633D]" /> Fund
-                    Balance
-                  </h3>
-                  <Doughnut data={fundBalanceData} options={chartOptions} />
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                  <h3 className="text-lg font-semibold mb-4 text-[#202046] flex items-center">
-                    <FiTrendingUp className="mr-2 text-[#FE633D]" /> Spending by
-                    Fund
-                  </h3>
-                  <Bar data={spendingByFundData} options={chartOptions} />
-                </div>
+                <ChartCard
+                  icon={FiDollarSign}
+                  title="Fund Balance"
+                  chartType={Doughnut}
+                  data={fundBalanceData}
+                  options={chartOptions}
+                  iconColor="text-[#FE633D]"
+                />
+                <ChartCard
+                  icon={FiTrendingUp}
+                  title="Spending by Fund"
+                  chartType={Bar}
+                  data={spendingByFundData}
+                  options={chartOptions}
+                  iconColor="text-[#FE633D]"
+                />
               </div>
             </div>
           )}

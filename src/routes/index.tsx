@@ -30,7 +30,7 @@ const AppRoutes = () => (
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/users" element={<UserManagementPage />} />
       <Route path="/reports" element={<ReportsPage />} />
-      <Route path="/not-found" element={<NotFoundPage />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </Router>
 );

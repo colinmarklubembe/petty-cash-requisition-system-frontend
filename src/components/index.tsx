@@ -15,6 +15,8 @@ export { default as LoadingSpinner } from "./ui/LoadingSpinner";
 export { default as DownloadButton } from "./ui/DownloadReport";
 export { default as SessionExpiredDialog } from "./ui/SessionExpiredDialog";
 export { default as ConfirmDeleteDialog } from "./ui/ConfirmDelete";
+export { default as ChartCard } from "./ui/ChartCard";
+export { default as StatCard } from "./ui/StatCard";
 // forms
 export { default as CreateCompany } from "./forms/CreateCompany";
 export { default as CreateTransaction } from "./forms/CreateTransaction";
