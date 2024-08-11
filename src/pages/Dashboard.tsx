@@ -131,31 +131,31 @@ const Dashboard = () => {
                   icon={FiUsers}
                   label="Total Users"
                   value={totalUsers}
-                  iconColor="text-[#FE633D]"
+                  iconColor="text-[#FFFFFF]"
                 />
                 <StatCard
                   icon={FiFolder}
                   label="Total Funds"
                   value={totalFunds}
-                  iconColor="text-[#FE633D]"
+                  iconColor="text-[#FFFFFF]"
                 />
                 <StatCard
                   icon={FiTrendingUp}
                   label="Active Funds"
                   value={activeFunds}
-                  iconColor="text-[#FE633D]"
+                  iconColor="text-[#FFFFFF]"
                 />
                 <StatCard
                   icon={FiClipboard}
                   label="Monthly Requisitions"
                   value={monthlyRequisitions}
-                  iconColor="text-[#FE633D]"
+                  iconColor="text-[#FFFFFF]"
                 />
                 <StatCard
                   icon={FiFile}
                   label="Monthly Transactions"
                   value={monthlyTransactions}
-                  iconColor="text-[#FE633D]"
+                  iconColor="text-[#FFFFFF]"
                 />
               </div>
 
