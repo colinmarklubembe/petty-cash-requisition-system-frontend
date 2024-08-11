@@ -13,7 +13,9 @@ import {
   UserManagementPage,
   ReportsPage,
   NotFoundPage,
+  UnauthorizedPage,
 } from "../pages";
+import { ProtectedRoute } from "../validators";
 
 const AppRoutes = () => (
   <Router>
@@ -25,11 +27,33 @@ const AppRoutes = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/companies" element={<CompaniesPage />} />
       <Route path="/funds" element={<PettyFundsPage />} />
-      <Route path="/approvals" element={<ApprovalsPage />} />
       <Route path="/transactions" element={<TransactionsPage />} />
       <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/users" element={<UserManagementPage />} />
-      <Route path="/reports" element={<ReportsPage />} />
+      <Route
+        path="/approvals"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "FINANCE"]}>
+            <ApprovalsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <UserManagementPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "FINANCE"]}>
+            <ReportsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </Router>

@@ -19,6 +19,22 @@ class TransactionApi {
     }
   }
 
+  async getUserTransactions() {
+    try {
+      const token = localStorage.getItem("token");
+      const companyId = localStorage.getItem("companyId");
+      const response = await axios.get(`${API_URL}/user-transactions`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "company-id": `${companyId}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  }
+
   async getTransactionById(transactionId: string) {
     try {
       const response = await axios.get(`${API_URL}/${transactionId}`);

@@ -19,6 +19,23 @@ class DashboardApi {
       throw error;
     }
   }
+
+  async getUserDashboardData() {
+    const token = localStorage.getItem("token");
+    const companyId = localStorage.getItem("companyId");
+    try {
+      const response = await axios.get(`${API_URL}/user`, {
+        headers: {
+          "company-id": `${companyId}`,
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  }
 }
 
 const dashboardApi = new DashboardApi();

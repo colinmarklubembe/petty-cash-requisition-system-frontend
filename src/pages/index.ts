@@ -11,3 +11,4 @@ export { default as UserManagementPage } from "./UserManagement";
 export { default as SettingsPage } from "./Settings";
 export { default as ReportsPage } from "./Reports";
 export { default as NotFoundPage } from "./NotFound";
+export { default as UnauthorizedPage } from "./Unauthorized";

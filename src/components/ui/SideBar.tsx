@@ -27,16 +27,23 @@ const Sidebar = ({
     window.location.href = "/login";
   };
 
+  const userRole = localStorage.getItem("userRole");
   const menuItems = [
     { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
     { to: "/funds", icon: <FiDatabase />, label: "Funds" },
     { to: "/requisitions", icon: <FiClipboard />, label: "Requisitions" },
-    { to: "/approvals", icon: <FiFileText />, label: "Approvals" },
+    ...(userRole !== "EMPLOYEE"
+      ? [{ to: "/approvals", icon: <FiFileText />, label: "Approvals" }]
+      : []),
     { to: "/transactions", icon: <FiDollarSign />, label: "Transactions" },
-    { to: "/reports", icon: <FiBarChart2 />, label: "Reports" },
+    ...(userRole !== "EMPLOYEE"
+      ? [{ to: "/reports", icon: <FiBarChart2 />, label: "Reports" }]
+      : []),
     { to: "/settings", icon: <FiSettings />, label: "Settings" },
-    { to: "/users", icon: <FiUser />, label: "User Management" },
-    { to: "/logout", icon: <FiLogOut />, label: "Logout", onClick: logout },
+    ...(userRole === "ADMIN"
+      ? [{ to: "/users", icon: <FiUser />, label: "User Management" }]
+      : []),
+    { to: "/#", icon: <FiLogOut />, label: "Logout", onClick: logout },
   ];
 
   return (
@@ -44,6 +51,7 @@ const Sidebar = ({
       className={`fixed inset-y-0 left-0 bg-[#202046] text-white transition-all duration-300 ${
         isSidebarOpen ? "w-56" : "w-12"
       } flex flex-col border-r border-[#F05A28]`}
+      style={{ zIndex: 1000 }}
     >
       <div className="flex items-center justify-between p-4">
         <button
@@ -81,8 +89,12 @@ const Sidebar = ({
                     {label}
                   </span>
                 </Link>
+                {/* Tooltip for collapsed sidebar */}
                 {!isSidebarOpen && (
-                  <div className="absolute left-full ml-2 w-max hidden group-hover:block bg-white border border-[#202046] text-[#202046] rounded-lg p-2 shadow-lg whitespace-nowrap">
+                  <div
+                    className="absolute left-full ml-2 w-max hidden group-hover:block bg-white border border-[#202046] text-[#202046] rounded-lg p-2 shadow-lg whitespace-nowrap"
+                    style={{ zIndex: 1500 }}
+                  >
                     {label}
                   </div>
                 )}

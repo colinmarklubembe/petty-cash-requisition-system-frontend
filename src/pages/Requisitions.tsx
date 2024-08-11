@@ -122,11 +122,17 @@ const RequisitionsPage: React.FC = () => {
   };
 
   const fetchRequisitions = useCallback(async () => {
+    const userRole = localStorage.getItem("userRole");
     setLoading(true);
     setError(null);
     try {
-      const response = await requisitionApi.getAllRequisitions();
-      setRequisitions(response.data.requisitions);
+      if (userRole !== "ADMIN") {
+        const response = await requisitionApi.getUserRequisitions();
+        setRequisitions(response.data.requisitions);
+      } else {
+        const response = await requisitionApi.getAllRequisitions();
+        setRequisitions(response.data.requisitions);
+      }
     } catch (error) {
       setError("Failed to fetch requisitions. Please try again.");
       console.error("Failed to fetch requisitions: ", error);

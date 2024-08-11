@@ -33,11 +33,17 @@ const TransactionsPage: React.FC = () => {
   const actionsRef = useRef<HTMLDivElement | null>(null);
 
   const fetchTransactions = useCallback(async () => {
+    const userRole = localStorage.getItem("userRole");
     setLoading(true);
     setError(null);
     try {
-      const response = await transactionApi.getAllTransactions();
-      setTransactions(response.data.transactions);
+      if (userRole !== "ADMIN") {
+        const response = await transactionApi.getUserTransactions();
+        setTransactions(response.data.transactions);
+      } else {
+        const response = await transactionApi.getAllTransactions();
+        setTransactions(response.data.transactions);
+      }
     } catch (error) {
       setError("Failed to fetch transactions. Please try again.");
       console.error("Failed to fetch transactions: ", error);

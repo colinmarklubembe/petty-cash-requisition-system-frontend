@@ -1,16 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../../src/styles/NotFound.css";
+import "../../src/styles/Unauthorized.css";
 
-const NotFound: React.FC = () => {
+const Unauthorized: React.FC = () => {
   const navigate = useNavigate();
-  const text = "Oops!";
+  const text = "Unauthorized!";
 
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-r from-[#202046] to-[#FE633D]">
-      <div className="text-center bg-white p-10 rounded-lg shadow-2xl max-w-lg w-full">
+      <div className="text-center bg-white p-12 rounded-lg shadow-2xl max-w-4xl w-full">
         <h1
-          className="text-9xl font-extrabold text-gray-800 drop-shadow-lg oops-animation"
+          className="text-7xl font-extrabold text-gray-800 drop-shadow-lg unauthorized-animation"
           style={{ fontFamily: "'Open Sans', sans-serif" }}
         >
           {text.split("").map((letter, index) => (
@@ -19,22 +19,22 @@ const NotFound: React.FC = () => {
             </span>
           ))}
         </h1>
-        <p className="text-2xl text-gray-600 mt-4 tracking-wide">
-          404 - The Page Can't Be Found
+        <p className="text-xl text-gray-600 mt-4 tracking-wide">
+          <strong>403</strong> - You don't have permission to access this page.
         </p>
         <p className="mt-4 text-gray-500">
-          The page you are looking for does not exist or has been moved. Please
-          check the URL or go back to the previous page.
+          Please contact your administrator if you believe this is an error, or
+          return to the dashboard.
         </p>
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/dashboard")}
           className="mt-8 inline-block bg-orange-500 text-white py-3 px-6 rounded-full shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-110 hover:bg-orange-600 focus:outline-none font-semibold text-lg"
         >
-          Go Back
+          Go to Dashboard
         </button>
       </div>
     </div>
   );
 };
 
-export default NotFound;
+export default Unauthorized;

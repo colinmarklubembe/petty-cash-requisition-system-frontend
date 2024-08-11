@@ -10,3 +10,11 @@ export interface AdminDashboardData {
   activeFunds: PettyFund[];
   spendingByFund: { fund: string; totalSpent: number }[];
 }
+
+export interface UserDashboardData {
+  userMonthlyTransactions: number;
+  userMonthlyRequisitions: number;
+  totalActiveFunds: number;
+  activeFunds: PettyFund[];
+  userSpendingByFund: { fund: string; totalSpent: number }[];
+}

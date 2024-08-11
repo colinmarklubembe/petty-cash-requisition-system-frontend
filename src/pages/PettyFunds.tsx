@@ -33,6 +33,7 @@ const PettyFundsPage: React.FC = () => {
     useSessionCheck();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [fundToDelete, setFundToDelete] = useState<string | null>(null);
+  const userRole = localStorage.getItem("userRole");
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -140,15 +141,26 @@ const PettyFundsPage: React.FC = () => {
     { key: "totalSpent" as keyof PettyFund, label: "Total Spent (Ugx)" },
   ];
 
-  const renderRowActions = (fund: PettyFund) => (
-    <ActionsMenu
-      onEdit={() => handleEditFund(fund.id)}
-      onDelete={() => handleDeleteFund(fund.id)}
-      onView={() => handleViewFund(fund.id)}
-      isOpen={activeFundId === fund.id}
-      closeMenu={() => setActiveFundId(null)}
-    />
-  );
+  const renderRowActions = (fund: PettyFund) => {
+    if (userRole === "ADMIN") {
+      return (
+        <ActionsMenu
+          onEdit={() => handleEditFund(fund.id)}
+          onDelete={() => handleDeleteFund(fund.id)}
+          onView={() => handleViewFund(fund.id)}
+          isOpen={activeFundId === fund.id}
+          closeMenu={() => setActiveFundId(null)}
+        />
+      );
+    }
+    return (
+      <ActionsMenu
+        onView={() => handleViewFund(fund.id)}
+        isOpen={activeFundId === fund.id}
+        closeMenu={() => setActiveFundId(null)}
+      />
+    );
+  };
 
   const renderCustomCell = (key: keyof PettyFund, item: PettyFund) => {
     return <span>{renderCell(item[key])}</span>;
@@ -164,13 +176,15 @@ const PettyFundsPage: React.FC = () => {
       >
         <Header pageTitle="Funds" />
         <main className="mt-6 p-6 flex flex-col h-full">
-          <button
-            onClick={() => setShowCreateFundModal(true)}
-            className="bg-orange-500 text-white py-2 px-4 rounded-full hover:bg-orange-700 transition-colors flex items-center mb-6 self-end"
-          >
-            <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            Create Petty Fund
-          </button>
+          {userRole === "ADMIN" && (
+            <button
+              onClick={() => setShowCreateFundModal(true)}
+              className="bg-orange-500 text-white py-2 px-4 rounded-full hover:bg-orange-700 transition-colors flex items-center mb-6 self-end"
+            >
+              <FontAwesomeIcon icon={faPlus} className="mr-2" />
+              Create Petty Fund
+            </button>
+          )}
           {showCreateFundModal && (
             <Modal
               isVisible={showCreateFundModal}
