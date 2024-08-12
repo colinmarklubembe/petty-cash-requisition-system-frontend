@@ -137,13 +137,13 @@ const ApprovalsPage: React.FC = () => {
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
-            <div className="flex-grow">
+            <div className="flex-grow overflow-x-auto">
               <Table
                 columns={columns}
                 data={approvals}
                 renderCustomCell={renderCustomCell}
                 renderRowActions={(approval) => (
-                  <div className="flex justify-center space-x-4">
+                  <div className="flex flex-wrap justify-center space-x-4">
                     <button
                       onClick={() => handleApprove(approval.id)}
                       className="flex items-center justify-center bg-green-100 text-green-800 hover:bg-green-300 border border-green-300 rounded-full px-2 py-1 text-sm transition-colors duration-200"
@@ -172,7 +172,7 @@ const ApprovalsPage: React.FC = () => {
           )}
         </main>
       </div>
-      {showSessionExpiredDialog === true && (
+      {showSessionExpiredDialog && (
         <SessionExpiredDialog
           onClose={() => setShowSessionExpiredDialog(false)}
         />
