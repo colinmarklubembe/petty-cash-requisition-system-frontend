@@ -1,7 +1,7 @@
 import { Bar } from "react-chartjs-2";
 import { FiTrendingUp, FiClipboard, FiFile } from "react-icons/fi";
-import { StatCard, ChartCard } from "../components";
-import { UserDashboardData } from "../types/Dashboard";
+import { StatCard, ChartCard } from "..";
+import { UserDashboardData } from "../../types/Dashboard";
 
 const UserDashboard = ({ data }: { data: UserDashboardData | null }) => {
   if (!data) {

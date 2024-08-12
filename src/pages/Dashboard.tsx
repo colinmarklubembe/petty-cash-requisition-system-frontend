@@ -4,13 +4,13 @@ import { dashboardApi } from "../api";
 import { useSessionCheck } from "../hooks";
 import { AdminDashboardData, UserDashboardData } from "../types/Dashboard";
 import {
-  Sidebar,
   Header,
+  Sidebar,
+  UserDashboard,
+  AdminDashboard,
   LoadingSpinner,
   SessionExpiredDialog,
 } from "../components";
-import AdminDashboard from "./AdminDashboard";
-import UserDashboard from "./UserDashboard";
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);

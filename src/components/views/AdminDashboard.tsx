@@ -7,8 +7,8 @@ import {
   FiFolder,
   FiFile,
 } from "react-icons/fi";
-import { StatCard, ChartCard } from "../components";
-import { AdminDashboardData } from "../types/Dashboard";
+import { StatCard, ChartCard } from "..";
+import { AdminDashboardData } from "../../types/Dashboard";
 
 const AdminDashboard = ({ data }: { data: AdminDashboardData | null }) => {
   if (!data) {

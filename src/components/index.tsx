@@ -27,6 +27,8 @@ export { default as CreateRequisition } from "./forms/CreateRequisition";
 export { default as EditRequisitionForm } from "./forms/EditRequisition";
 export { default as CreatePettyFundForm } from "./forms/CreatePettyFundForm";
 // views
+export { default as UserDashboard } from "./views/UserDashboard";
+export { default as AdminDashboard } from "./views/AdminDashboard";
 export { default as UserReportView } from "./views/UserReportView";
 export { default as UserDetailView } from "./views/UserDetailView";
 export { default as CompanyReportView } from "./views/CompanyReportView";
