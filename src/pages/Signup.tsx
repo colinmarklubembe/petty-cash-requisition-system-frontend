@@ -4,13 +4,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { authApi } from "../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import background from "../assets/image/herobackground1.jpg";
 import { signupSchema } from "../validators";
 
 const Signup = () => {
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -27,6 +28,10 @@ const Signup = () => {
     try {
       const response = await authApi.signup(data);
       setToastMessage(response.message);
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error || "Signup failed. Please try again.";
