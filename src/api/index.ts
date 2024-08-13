@@ -6,5 +6,4 @@ export { default as approvalApi } from "./approval";
 export { default as transactionApi } from "./transaction";
 export { default as reportApi } from "./report";
 export { default as settingsApi } from "./settings";
-export { default as userApi } from "./user";
 export { default as dashboardApi } from "./dashboard";

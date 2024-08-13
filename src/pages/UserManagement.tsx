@@ -1,4 +1,4 @@
-import { companyApi, userApi } from "../api";
+import { companyApi, authApi } from "../api";
 import { UserCompany } from "../types/User";
 import { useSessionCheck } from "../hooks";
 import { useState, useEffect, useCallback } from "react";
@@ -40,7 +40,7 @@ const UserManagementPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await userApi.getCompanyUsers();
+      const response = await authApi.getCompanyUsers();
       setUsers(response.data);
     } catch (err) {
       setError("Failed to load users. Please try again.");

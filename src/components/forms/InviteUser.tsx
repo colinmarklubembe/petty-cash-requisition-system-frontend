@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faUser } from "@fortawesome/free-solid-svg-icons";
-import { userApi } from "../../api";
+import { authApi } from "../../api";
 import { inviteUserSchema } from "../../validators";
 
 export interface InviteUserFormInputs {
@@ -35,7 +35,7 @@ const InviteUser: React.FC<InviteUserProps> = ({ onClose, onCreate }) => {
     setToastMessage(null);
 
     try {
-      await userApi.inviteUser(data);
+      await authApi.inviteUser(data);
       setToastMessage("User invited successfully!");
       onCreate(data);
       onClose();

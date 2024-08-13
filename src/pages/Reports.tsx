@@ -1,5 +1,5 @@
 import { UserCompany } from "../types/User";
-import { reportApi, userApi } from "../api";
+import { reportApi, authApi } from "../api";
 import { CompanyReport, UserReport } from "../types/Report";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSessionCheck } from "../hooks";
@@ -62,7 +62,7 @@ const ReportsPage: React.FC = () => {
       if (reportType === "user" && !users.length) {
         const fetchUsers = async () => {
           try {
-            const response = await userApi.getCompanyUsers();
+            const response = await authApi.getCompanyUsers();
             setUsers(response.data);
           } catch (error) {
             setError("Failed to fetch users. Please try again.");
@@ -80,7 +80,7 @@ const ReportsPage: React.FC = () => {
       if (reportType === "user" && !users.length) {
         const fetchUsers = async () => {
           try {
-            const response = await userApi.getCompanyUsers();
+            const response = await authApi.getCompanyUsers();
             setUsers(response.data);
           } catch (error) {
             setError("Failed to fetch users. Please try again.");
