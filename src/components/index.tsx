@@ -15,6 +15,7 @@ export { default as ChartCard } from "./ui/ChartCard";
 export { default as ActionsMenu } from "./ui/ActionsMenu";
 export { default as LoadingSpinner } from "./ui/LoadingSpinner";
 export { default as DownloadButton } from "./ui/DownloadReport";
+export { default as ToggleDarkMode } from "./ui/ToggleDarkMode";
 export { default as ConfirmDeleteDialog } from "./ui/ConfirmDelete";
 export { default as SessionExpiredDialog } from "./ui/SessionExpiredDialog";
 // forms
