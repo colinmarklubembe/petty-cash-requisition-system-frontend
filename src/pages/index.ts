@@ -12,3 +12,5 @@ export { default as SettingsPage } from "./Settings";
 export { default as ReportsPage } from "./Reports";
 export { default as NotFoundPage } from "./NotFound";
 export { default as UnauthorizedPage } from "./Unauthorized";
+export { default as ResetPasswordPage } from "./ResetPassword";
+export { default as ForgotPasswordPage } from "./ForgotPassword";

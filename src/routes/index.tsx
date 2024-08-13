@@ -14,6 +14,8 @@ import {
   ReportsPage,
   NotFoundPage,
   UnauthorizedPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
 } from "../pages";
 import { ProtectedRoute } from "../validators";
 
@@ -29,6 +31,8 @@ const AppRoutes = () => (
       <Route path="/funds" element={<PettyFundsPage />} />
       <Route path="/transactions" element={<TransactionsPage />} />
       <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route
         path="/approvals"
         element={

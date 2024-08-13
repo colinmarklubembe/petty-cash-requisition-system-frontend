@@ -5,4 +5,6 @@ export { default as companySchema } from "./schemas/company";
 export { default as requisitionSchema } from "./schemas/requisition";
 export { default as transactionSchema } from "./schemas/transaction";
 export { default as inviteUserSchema } from "./schemas/inviteUser";
+export { default as forgotPasswordSchema } from "./schemas/forgotPassword";
+export { default as resetPasswordSchema } from "./schemas/resetPassword";
 export { default as ProtectedRoute } from "./ProtectedRoute";

@@ -27,6 +27,30 @@ class AuthApi {
       throw error;
     }
   };
+
+  forgotPassword = async (email: string) => {
+    try {
+      const response = await axios.post(`${API_URL}/forgot-password`, {
+        email,
+      });
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  resetPassword = async (password: string, userId: string) => {
+    try {
+      const response = await axios.put(`${API_URL}/reset-password/${userId}`, {
+        newPassword: password,
+      });
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
 }
 
 const authApi = new AuthApi();

@@ -3,15 +3,26 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { authApi } from "../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUser,
+  faEnvelope,
+  faLock,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import background from "../assets/image/herobackground1.jpg";
 import { signupSchema } from "../validators";
 
 const Signup = () => {
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   const {
     register,
@@ -113,16 +124,26 @@ const Signup = () => {
             <label className="block text-gray-700 text-sm font-medium">
               Password
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
+            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500 relative">
               <span className="px-3">
                 <FontAwesomeIcon icon={faLock} className="text-blue-900 " />
               </span>
               <input
-                type="password"
-                className="w-full p-3 focus:outline-none"
+                type={showPassword ? "text" : "password"}
+                className="w-full p-3 pr-10 focus:outline-none"
                 placeholder="Enter your password"
                 {...register("password")}
               />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 px-3 py-2 z-10"
+              >
+                <FontAwesomeIcon
+                  icon={showPassword ? faEyeSlash : faEye}
+                  className="text-blue-900 text-sm"
+                />
+              </button>
             </div>
             <p className="text-red-600 text-sm mt-1">
               {errors.password?.message}
