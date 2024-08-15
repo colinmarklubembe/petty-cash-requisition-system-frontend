@@ -14,6 +14,7 @@ const AdminDashboard = ({ data }: { data: AdminDashboardData | null }) => {
   if (!data) {
     return <p>Data is not available.</p>;
   }
+
   const {
     totalUsers,
     totalFunds,
@@ -29,9 +30,9 @@ const AdminDashboard = ({ data }: { data: AdminDashboardData | null }) => {
     datasets: [
       {
         data: companyFunds.map((fund) => fund.currentBalance),
-        backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384", "#4BC0C0"],
-        borderColor: ["#36A2EB", "#FFCE56", "#FF6384", "#4BC0C0"],
-        borderWidth: 1,
+        backgroundColor: ["#4F9D9D", "#FF7F50", "#FF6347", "#1E90FF"],
+        borderColor: ["#4F9D9D", "#FF7F50", "#FF6347", "#1E90FF"],
+        borderWidth: 2,
       },
     ],
   };
@@ -42,8 +43,8 @@ const AdminDashboard = ({ data }: { data: AdminDashboardData | null }) => {
       {
         label: "Spending by Fund",
         data: spendingByFund.map((fund) => fund.totalSpent),
-        backgroundColor: "#FF6384",
-        borderColor: "#FF6384",
+        backgroundColor: "#FF6347",
+        borderColor: "#FF6347",
         borderWidth: 2,
         fill: false,
       },
@@ -61,8 +62,16 @@ const AdminDashboard = ({ data }: { data: AdminDashboardData | null }) => {
     plugins: {
       legend: {
         position: "top" as const,
+        labels: {
+          color: "#333",
+        },
       },
       tooltip: {
+        backgroundColor: "#fff",
+        titleColor: "#333",
+        bodyColor: "#333",
+        borderColor: "#ddd",
+        borderWidth: 1,
         callbacks: {
           label: function (tooltipItem: any) {
             return `${tooltipItem.label}: ${tooltipItem.raw}`;
@@ -73,41 +82,41 @@ const AdminDashboard = ({ data }: { data: AdminDashboardData | null }) => {
   };
 
   return (
-    <>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
+    <div className="space-y-6 p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         <StatCard
           icon={FiUsers}
           label="Total Users"
           value={totalUsers}
-          iconColor="text-[#FFFFFF]"
+          iconColor="bg-gradient-to-r from-blue-500 to-teal-500"
         />
         <StatCard
           icon={FiFolder}
           label="Total Funds"
           value={totalFunds}
-          iconColor="text-[#FFFFFF]"
+          iconColor="bg-gradient-to-r from-yellow-400 to-orange-500"
         />
         <StatCard
           icon={FiTrendingUp}
           label="Active Funds"
           value={totalActiveFunds}
-          iconColor="text-[#FFFFFF]"
+          iconColor="bg-gradient-to-r from-green-400 to-teal-500"
         />
         <StatCard
           icon={FiClipboard}
           label="Monthly Requisitions"
           value={monthlyRequisitions}
-          iconColor="text-[#FFFFFF]"
+          iconColor="bg-gradient-to-r from-purple-500 to-pink-500"
         />
         <StatCard
           icon={FiFile}
           label="Monthly Transactions"
           value={monthlyTransactions}
-          iconColor="text-[#FFFFFF]"
+          iconColor="bg-gradient-to-r from-red-500 to-pink-500"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ChartCard
           icon={FiDollarSign}
           title="Fund Balance"
@@ -125,7 +134,7 @@ const AdminDashboard = ({ data }: { data: AdminDashboardData | null }) => {
           iconColor="text-[#FE633D]"
         />
       </div>
-    </>
+    </div>
   );
 };
 

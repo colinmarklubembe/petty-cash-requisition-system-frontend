@@ -6,23 +6,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CompanyFormInputs } from "../components/forms/CreateCompany";
 import { Company, CompanyResponse } from "../types/Company";
 import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  CreateCompany,
-  LoadingSpinner,
-  SessionExpiredDialog,
-} from "../components";
+import { CreateCompany, LoadingSpinner, SessionExpiredDialog } from "../components";
 
 const CompaniesPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [companies, setCompanies] = useState<Company[]>([]);
   const [companiesWithRoles, setCompaniesWithRoles] = useState<
     { company: Company; role: string }[]
   >([]);
   const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
-  const { showSessionExpiredDialog, setShowSessionExpiredDialog } =
-    useSessionCheck();
-
+  const { showSessionExpiredDialog, setShowSessionExpiredDialog } = useSessionCheck();
   const navigate = useNavigate();
   const formRef = useRef<HTMLDivElement | null>(null);
 
@@ -54,7 +47,7 @@ const CompaniesPage = () => {
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error ||
-        "Failed to fetch approvals. Please try again.";
+        "Failed to fetch companies. Please try again.";
       setError(errorMessage);
       console.error("Error fetching companies:", error);
     } finally {
@@ -64,7 +57,7 @@ const CompaniesPage = () => {
 
   useEffect(() => {
     fetchCompanies();
-  }, [fetchCompanies, companies]);
+  }, [fetchCompanies]);
 
   const handleCreateCompany = (newCompanyInput: CompanyFormInputs) => {
     const newCompany: Company = {
@@ -78,36 +71,34 @@ const CompaniesPage = () => {
       updatedAt: new Date().toISOString(),
     };
 
-    setCompanies((prevCompanies) => [...prevCompanies, newCompany]);
+    setCompaniesWithRoles((prevCompanies) => [...prevCompanies, { company: newCompany, role: 'Owner' }]);
     setShowCreateCompanyModal(false);
   };
 
   const handleCompanyClick = (companyId: string, role: string) => {
     localStorage.setItem("companyId", companyId);
     localStorage.setItem("userRole", role);
-
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1000);
+    navigate("/dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-gray-200 flex items-center justify-center">
-      <div className="w-full p-8 bg-white rounded-lg shadow-lg max-w-6xl">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-[#202046]">Your Companies</h1>
+    <div className="min-h-screen bg-gradient-to-r from-gray-100 to-gray-300 flex items-center justify-center p-6">
+      <div className="w-full max-w-6xl p-8 bg-white rounded-lg shadow-xl border border-gray-300">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800">Your Companies</h1>
           <button
             onClick={() => setShowCreateCompanyModal(true)}
-            className="flex items-center bg-[#202046] text-white px-4 py-2 rounded-full hover:bg-[#F05A28]"
+            className="flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-full shadow-md hover:bg-blue-700 transition-colors duration-300"
           >
-            <FontAwesomeIcon icon={faPlus} className="mr-2" /> Create New
-            Company
+            <FontAwesomeIcon icon={faPlus} className="mr-2" /> Create New Company
           </button>
         </div>
         {loading ? (
-          <LoadingSpinner />
+          <div className="flex justify-center items-center min-h-[300px]">
+            <LoadingSpinner />
+          </div>
         ) : error ? (
-          <p className="text-red-500">{error}</p>
+          <p className="text-red-600 text-center text-lg">{error}</p>
         ) : (
           <div
             className={`grid gap-8 ${
@@ -122,20 +113,17 @@ const CompaniesPage = () => {
               <div
                 key={index}
                 onClick={() => handleCompanyClick(company.id, role)}
-                className="bg-white p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer border border-[#202046]"
-                style={{ minHeight: "200px" }}
+                className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 cursor-pointer border-l-4 border-blue-500"
               >
-                <h2 className="text-xl font-bold mb-2 text-[#202046]">
+                <h2 className="text-2xl font-semibold mb-2 text-gray-800">
                   {company.name}
                 </h2>
-                <p className="text-gray-700 mb-4">
+                <p className="text-gray-600 mb-4">
                   {company.description || "No description available"}
                 </p>
-                <div className="text-gray-600 text-sm">
+                <div className="text-gray-500 text-sm">
                   <p>
-                    <strong>Address:</strong> {company.address.street},{" "}
-                    {company.address.city}, {company.address.state},{" "}
-                    {company.address.country}
+                    <strong>Address:</strong> {company.address.street}, {company.address.city}, {company.address.state}, {company.address.country}
                   </p>
                   <p>
                     <strong>Phone:</strong> {company.phoneNumber}
@@ -154,9 +142,9 @@ const CompaniesPage = () => {
       </div>
 
       {showCreateCompanyModal && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-60 flex items-center justify-center z-50">
           <div
-            className="bg-white p-4 rounded-lg shadow-lg w-1/2 md:w-1/3 relative"
+            className="bg-white p-6 rounded-lg shadow-lg w-full md:w-1/2 lg:w-1/3 relative"
             ref={formRef}
           >
             <button

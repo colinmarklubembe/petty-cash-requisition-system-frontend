@@ -58,12 +58,12 @@ const Signup = () => {
       className="bg-cover bg-center min-h-screen flex items-center justify-center"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <div className="max-w-md w-full p-6 bg-white bg-opacity-80 rounded-lg shadow-lg">
+      <div className="max-w-md w-full p-6 bg-white bg-opacity-90 rounded-lg shadow-xl transition-transform transform hover:scale-105">
         <h2 className="text-3xl font-bold mb-6 text-center text-blue-900">
           Signup
         </h2>
         {toastMessage && (
-          <div className="mb-6 p-3 rounded bg-blue-100 text-blue-700">
+          <div className="mb-6 p-3 rounded bg-blue-100 text-blue-700 border border-blue-300 transition-opacity opacity-90 hover:opacity-100">
             {toastMessage}
           </div>
         )}
@@ -72,7 +72,7 @@ const Signup = () => {
             <label className="block text-gray-700 text-sm font-medium">
               First Name
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
+            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500 transition-shadow duration-300">
               <span className="px-3">
                 <FontAwesomeIcon icon={faUser} className="text-blue-900" />
               </span>
@@ -90,7 +90,7 @@ const Signup = () => {
             <label className="block text-gray-700 text-sm font-medium">
               Last Name
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
+            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500 transition-shadow duration-300">
               <span className="px-3">
                 <FontAwesomeIcon icon={faUser} className="text-blue-900" />
               </span>
@@ -108,7 +108,7 @@ const Signup = () => {
             <label className="block text-gray-700 text-sm font-medium">
               Email
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500">
+            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500 transition-shadow duration-300">
               <span className="px-3">
                 <FontAwesomeIcon icon={faEnvelope} className="text-blue-900" />
               </span>
@@ -124,9 +124,9 @@ const Signup = () => {
             <label className="block text-gray-700 text-sm font-medium">
               Password
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500 relative">
+            <div className="flex items-center border border-gray-300 rounded-lg mt-1 focus-within:ring-2 focus-within:ring-blue-500 relative transition-shadow duration-300">
               <span className="px-3">
-                <FontAwesomeIcon icon={faLock} className="text-blue-900 " />
+                <FontAwesomeIcon icon={faLock} className="text-blue-900" />
               </span>
               <input
                 type={showPassword ? "text" : "password"}
