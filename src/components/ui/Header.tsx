@@ -49,7 +49,9 @@ const Header: React.FC<HeaderProps> = ({ pageTitle }) => {
         </button>
         <div
           className={`absolute top-full right-0 mt-2 bg-white text-black rounded-lg shadow-lg p-4 flex flex-col space-y-2 transition-transform transform ${
-            isDropdownOpen ? "scale-100 opacity-100" : "scale-75 opacity-0"
+            isDropdownOpen
+              ? "scale-100 opacity-100"
+              : "scale-75 opacity-0 pointer-events-none"
           }`}
         >
           <button
@@ -76,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({ pageTitle }) => {
             aria-label="User profile"
             title="User profile"
             className="flex items-center space-x-2 hover:text-[#FE633D] transition-colors"
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate("/settings")}
           >
             <FiUser className="h-6 w-6" />
             <span className="text-sm">Profile</span>
