@@ -88,31 +88,31 @@ const AdminDashboard = ({ data }: { data: AdminDashboardData | null }) => {
           icon={FiUsers}
           label="Total Users"
           value={totalUsers}
-          iconColor="bg-gradient-to-r from-blue-500 to-teal-500"
+          iconColor=""
         />
         <StatCard
           icon={FiFolder}
           label="Total Funds"
           value={totalFunds}
-          iconColor="bg-gradient-to-r from-yellow-400 to-orange-500"
+          iconColor=""
         />
         <StatCard
           icon={FiTrendingUp}
           label="Active Funds"
           value={totalActiveFunds}
-          iconColor="bg-gradient-to-r from-green-400 to-teal-500"
+          iconColor=""
         />
         <StatCard
           icon={FiClipboard}
           label="Monthly Requisitions"
           value={monthlyRequisitions}
-          iconColor="bg-gradient-to-r from-purple-500 to-pink-500"
+          iconColor=""
         />
         <StatCard
           icon={FiFile}
           label="Monthly Transactions"
           value={monthlyTransactions}
-          iconColor="bg-gradient-to-r from-red-500 to-pink-500"
+          iconColor=""
         />
       </div>
 
